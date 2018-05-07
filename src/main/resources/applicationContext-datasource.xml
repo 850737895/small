@@ -63,7 +63,8 @@
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="mapperLocations" value="classpath*:mappers/*Mapper.xml"></property>
-
+        <!-- 配置mybatis全局配置文件 -->
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
         <!-- 分页插件 -->
         <property name="plugins">
             <array>
@@ -80,7 +81,7 @@
     </bean>
 
     <bean name="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <property name="basePackage" value="com.mmall.dao"/>
+        <property name="basePackage" value="com.small.dao"/>
     </bean>
 
     <!-- 使用@Transactional进行声明式事务管理需要声明下面这行 -->
