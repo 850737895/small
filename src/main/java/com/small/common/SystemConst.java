@@ -56,6 +56,32 @@ public class SystemConst {
 
     public static final String NOT_ADMIN_AUTH = "不是管理员无法登录";
 
+    public static final String ADD_CATEGORY_SUCCESS = "添加品类成功";
+
+    public static final String ADD_CATEGORY_FAIL = "添加品类失败";
+
+    public static final String MODIFY_CATORYNAME_SUCCESS = "修改产品种类名称成功";
+
+    public static final String MODIFY_CATORYNAME_FAIL= "修改产品种类名称失败";
+
+    public static final String MODIFY_PRODUCT_SUCCESS= "修改产品信息成功";
+
+    public static final String MODIFY_PRODUCT_FAIL= "修改产品信息失败";
+
+    public static final String INSERT_PRODUCT_SUCCESS= "新增产品信息成功";
+
+    public static final String INSERT_PRODUCT_FAIL= "新增产品信息失败";
+
+    public static final String MODIFY_PRODUCT_STATUS_SUCCESS= "修改产品状态成功";
+
+    public static final String MODIFY_PRODUCT_STATUS_FAIL= "修改产品状态失败";
+
+    public static final String PRODUCT_NOT_EISTS_OR_DOWNLINE = "产品不存在或者已经下架";
+
+    public static final String DEFAULT_FTP_SERVER_IP = "47.104.128.12";
+
+
+
 
     public interface Role{
 

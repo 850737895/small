@@ -29,12 +29,12 @@ public class PropertiesUtil {
         }
     }
 
-    public static String getPropertyValues(String key) {
+    public static String getPropertyValues(String key,String defaultValue) {
         if(StringUtils.isBlank(key)) {
             logger.warn("key的取值为空");
-            return null;
+            return defaultValue;
         }
-        String value = properties.getProperty(key.trim());
+        String value = properties.getProperty(key.trim()).trim();
         return value;
     }
 

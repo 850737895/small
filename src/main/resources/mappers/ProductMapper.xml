@@ -176,4 +176,42 @@
       update_time = now()
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectList" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from mmall_product
+  </select>
+
+  <!--where 标签 会去除多余的and 和 or-->
+  <select id="selectByIdAndName" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List"/>
+    FROM
+    mmall_product
+    <where>
+      <if test="productId!=null">
+        and id#{productId}
+      </if>
+      <if test="productName!=null and productName!=''">
+        and name like #{productName}
+      </if>
+    </where>
+  </select>
+
+  <select id="selectByNameAndCategorys" parameterType="map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from
+    mall_product
+    where status =1
+    <if test="keyWord!=null and keyWord!=''">
+       and name like #{keyWord}
+    </if>
+    <if test="categoryList!=null and categoryList.size!=0">
+      <foreach collection="categoryList" item="item" index="index" open="(" separator="," close=")">
+        and category_id in #{item}
+      </foreach>
+    </if>
+  </select>
 </mapper>

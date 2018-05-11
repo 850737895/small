@@ -199,4 +199,19 @@ public class UserServiceImpl implements IUserService  {
     }
 
 
+    /**
+     * 检查用户是否是管理员
+     * @param user user
+     * @return boolean
+     */
+    public boolean checkAmdinRole(User user) {
+        if(user == null) {
+            return false;
+        }
+        if(user.getRole()==SystemConst.Role.AMDIN) {
+            return true;
+        }else {
+            return false;
+        }
+    }
 }
