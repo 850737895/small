@@ -86,7 +86,7 @@ public class CartServiceImpl implements ICartService {
     @Override
     public SystemResponse<Integer> getCartProductCount(Integer userId) {
         Integer cartProductCount = cartMapper.selectCartProductCountByUserId(userId);
-        return null;
+        return SystemResponse.createSuccessByData(cartProductCount);
     }
 
 

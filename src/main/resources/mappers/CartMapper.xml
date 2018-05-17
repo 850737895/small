@@ -156,7 +156,7 @@
     where
     user_id=#{userId}
     <if test="productId!=null and productId!=''">
-      and productId=#{productId}
+      and product_id=#{productId}
     </if>
   </update>
 
