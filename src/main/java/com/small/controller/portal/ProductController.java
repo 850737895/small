@@ -27,6 +27,7 @@ public class ProductController {
         if(productId == null) {
             return SystemResponse.createErrorByMsg("查询参数错误productId");
         }
+        System.out.println(11111);
         return productServiceImpl.getProductDetail4Portal(productId);
     }
 
