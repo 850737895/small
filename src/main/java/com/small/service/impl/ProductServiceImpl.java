@@ -51,9 +51,9 @@ public class ProductServiceImpl implements IProductService  {
         if(product.getId()!=null) {
             int rowCount = productMapper.updateByPrimaryKeySelective(product);
             if(rowCount > 0) {
-                return SystemResponse.createErrorByMsg(SystemConst.MODIFY_PRODUCT_FAIL);
+                return SystemResponse.createErrorByMsg(SystemConst.MODIFY_PRODUCT_SUCCESS);
             }
-            return SystemResponse.createSuccessByMsg(SystemConst.MODIFY_PRODUCT_SUCCESS);
+            return SystemResponse.createSuccessByMsg(SystemConst.MODIFY_PRODUCT_FAIL);
         }else {
             int rowCount = productMapper.insert(product);
             if(rowCount > 0) {
@@ -156,7 +156,7 @@ public class ProductServiceImpl implements IProductService  {
             String[] orderByArray = orderBy.split("_");
             String orderByKey =orderByArray[0];
             String orderBySort = orderByArray[1];
-            PageHelper.orderBy(orderByKey+"_"+orderBySort);
+            PageHelper.orderBy(orderByKey+" "+orderBySort);
         }
         List<Product> productList = productMapper.selectByNameAndCategorys(keyWord,categoryList);
         List<ProductListVo> productListVoList = Lists.newArrayList();

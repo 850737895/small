@@ -6,6 +6,7 @@ import com.small.common.SystemResponse;
 import com.small.service.IProductService;
 import com.small.vo.ProductDetailVo;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/product")
 public class ProductController {
 
+    @Autowired
     private IProductService productServiceImpl;
 
     @RequestMapping("/detail.do")
@@ -39,7 +41,9 @@ public class ProductController {
      * @param orderBy 价格排序  price_desc  pricue_asc
      * @return SystemResponse<ProductListVo>
      */
-    public SystemResponse<PageInfo> list(@RequestParam(value = "keyWord",required = false)String keyword,
+    @RequestMapping("/list.do")
+    @ResponseBody
+    public SystemResponse<PageInfo> list(@RequestParam(value = "keyword",required = false)String keyword,
                                          @RequestParam(value = "categoryId",required = false)Integer categoryId,
                                          @RequestParam(value = "pageNum",defaultValue = "1")Integer pageNum,
                                          @RequestParam(value = "pageSize",defaultValue ="10")Integer pageSize,

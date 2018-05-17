@@ -191,7 +191,7 @@
     mmall_product
     <where>
       <if test="productId!=null">
-        and id#{productId}
+        and id=#{productId}
       </if>
       <if test="productName!=null and productName!=''">
         and name like #{productName}
@@ -203,14 +203,15 @@
     select
     <include refid="Base_Column_List" />
     from
-    mall_product
+    mmall_product
     where status =1
     <if test="keyWord!=null and keyWord!=''">
        and name like #{keyWord}
     </if>
     <if test="categoryList!=null and categoryList.size!=0">
+      and category_id in
       <foreach collection="categoryList" item="item" index="index" open="(" separator="," close=")">
-        and category_id in #{item}
+         #{item}
       </foreach>
     </if>
   </select>

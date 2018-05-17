@@ -27,7 +27,7 @@ import javax.servlet.http.HttpSession;
  * Created by 85073 on 2018/5/8.
  */
 @Controller
-@RequestMapping("/product/manager")
+@RequestMapping("/manager/product")
 public class ProductManagerController {
 
     @Autowired
@@ -56,6 +56,13 @@ public class ProductManagerController {
         return productServiceImpl.saveOrUpdateProduct(product);
     }
 
+    /**
+     * 产品上下架功能
+     * @param session session
+     * @param status status
+     * @param productId productId
+     * @return SystemResponse
+     */
     @RequestMapping(value = "/set_sale_status.do",method = RequestMethod.POST)
     @ResponseBody
     public SystemResponse<String> modifyProductStatus(HttpSession session, @RequestParam(value = "status",defaultValue = "1")

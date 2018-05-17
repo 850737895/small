@@ -80,6 +80,18 @@ public class SystemConst {
 
     public static final String DEFAULT_FTP_SERVER_IP = "47.104.128.12";
 
+    public static final String DEFAULT_IMG_SERVER = "http://47.104.128.12/images/";
+
+    public static final String LIMIT_NUM_SUCCESS = "LIMIT_NUM_SUCCESS";
+
+    public static final String LIMIT_NUM_FAIL= "LIMIT_NUM_FAIL";
+
+    public static final Integer CART_IS_CHECKED = 1;
+
+    public static final Integer CART_IS_UNCHECKED = 0;
+
+
+
 
 
 
