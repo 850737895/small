@@ -90,15 +90,30 @@ public class SystemConst {
 
     public static final Integer CART_IS_UNCHECKED = 0;
 
-
-
-
-
-
     public interface Role{
 
          Integer CUSTOMER = 1;
 
         Integer AMDIN = 0;
     }
+
+    /**
+     * 支付宝 交易流水
+     */
+    public interface AliPayTradeStatus{
+        /**等待支付*/
+        public static final String WAIT_BUYER_PAY="WAIT_BUYER_PAY";
+        /**交易超时关闭*/
+        public static final String TRADE_CLOSED = "TRADE_CLOSED";
+        /**交易成功*/
+        public static final String TRADE_SUCCESS = "TRADE_SUCCESS";
+        /**交易完成不可退款*/
+        public static final String TRADE_FINISHED = "TRADE_FINISHED";
+    }
+
+    public interface PayPlatForm{
+        Integer ALI_PAY = 1;
+        Integer WX_PAY = 2;
+    }
+
 }
