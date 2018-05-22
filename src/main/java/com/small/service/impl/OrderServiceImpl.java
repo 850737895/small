@@ -11,6 +11,8 @@ import com.alipay.demo.trade.model.result.AlipayF2FPrecreateResult;
 import com.alipay.demo.trade.service.AlipayTradeService;
 import com.alipay.demo.trade.service.impl.AlipayTradeServiceImpl;
 import com.alipay.demo.trade.utils.ZxingUtils;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.small.common.*;
@@ -22,9 +24,9 @@ import com.small.utils.DateUtil;
 import com.small.utils.FTPUtil;
 import com.small.utils.PropertiesUtil;
 import com.small.vo.OrderItemVo;
+import com.small.vo.OrderProductVo;
 import com.small.vo.OrderVo;
 import com.small.vo.ShippingVo;
-import com.sun.tracing.dtrace.Attributes;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,7 +93,7 @@ public class OrderServiceImpl implements IOrderService {
         }
         retMap.put("orderNo",orderNo.toString());
 
-        AlipayTradePrecreateRequestBuilder builder = generatorAliPayResult(order);
+        AlipayTradePrecreateRequestBuilder builder = generatorAliPayResultBuilder(order);
         if(builder == null) {
             return SystemResponse.createErrorByMsg("用户订单中没有订单明细，无法发起支付");
         }
@@ -215,6 +217,60 @@ public class OrderServiceImpl implements IOrderService {
         return SystemResponse.createSuccessByData(orderVo);
     }
 
+    @Override
+    public SystemResponse<String> cancle(Integer userId, Long orderNo) {
+        Order order = orderMapper.selectByUserIdAndOrderNo(userId,orderNo);
+        if(null == order) {
+            return SystemResponse.createErrorByMsg("该用户不存在该订单");
+        }
+        if(order.getStatus()>=OrderStatusEnum.PAID.getCode()) {
+            return SystemResponse.createErrorByMsg("订单以付款,不能取消");
+        }
+        order.setStatus(OrderStatusEnum.CANCELED.getCode());
+        int rowCount = orderMapper.updateByPrimaryKey(order);
+        if(rowCount>0) {
+            return SystemResponse.createSuccess();
+        }
+        //TODO 第二期需要调用支付宝的取消接口
+        return SystemResponse.createErrorByMsg("取消订单失败");
+    }
+
+    @Override
+    public SystemResponse<OrderProductVo> getOrderCartProduct(Integer userId) {
+
+        List<Cart> cartList = cartMapper.selectCheckCartByUserId(userId);
+        if(cartList ==null && cartList.isEmpty()) {
+            return SystemResponse.createErrorByMsg("购物车为null");
+        }
+        SystemResponse systemResponse = generatorOrderItemListByCartList(userId,cartList);
+        if(!systemResponse.isSuccess()) {
+            return  systemResponse;
+        }
+        List<OrderItem> orderItemList = (List<OrderItem>) systemResponse.getData();
+        BigDecimal payment = calOrderTotalMoney(orderItemList);
+        List<OrderItemVo> orderItemVoList = assembleOrderItemVoList(orderItemList);
+
+        OrderProductVo orderProductVo = new OrderProductVo();
+        orderProductVo.setImageHost(PropertiesUtil.getPropertyValues("ftp.server.http.prefix",""));
+        orderProductVo.setOrderItemVoList(orderItemVoList);
+        orderProductVo.setProductTotalPrice(payment);
+        return SystemResponse.createSuccessByData(orderProductVo);
+    }
+
+    @Override
+    public SystemResponse<OrderVo> detail(Integer userId, Long orderNo) {
+        Order order = orderMapper.selectByUserIdAndOrderNo(userId,orderNo);
+        if(order == null) {
+            return SystemResponse.createErrorByMsg("该用户不存在该订单");
+        }
+        List<OrderItem> orderItemList = orderItemMapper.selectByOrderNoAndUserId(orderNo,userId);
+        if(orderItemList == null || orderItemList.size() == 0) {
+            return SystemResponse.createErrorByMsg("该订单没有订单明细......");
+        }
+        OrderVo orderVo = assembleOrderVo(order,orderItemList);
+        return SystemResponse.createSuccessByData(orderVo);
+    }
+
     /**
      * 组装orderVO
      * @param order order对象
@@ -245,12 +301,22 @@ public class OrderServiceImpl implements IOrderService {
         orderVo.setImageHost(PropertiesUtil.getPropertyValues("ftp.server.http.prefix",SystemConst.DEFAULT_IMG_SERVER));
 
         //填充orderItemVo
+        List<OrderItemVo> orderItemVOList = assembleOrderItemVoList(orderItemList);
+        orderVo.setOrderItemVoList(orderItemVOList);
+        return orderVo;
+    }
+
+    /**
+     * 把orderItem pojo  转为orderItemVo
+     * @param orderItemList
+     * @return
+     */
+    private List<OrderItemVo> assembleOrderItemVoList(List<OrderItem> orderItemList) {
         List<OrderItemVo> orderItemVOList = Lists.newArrayList();
         for (OrderItem orderItem:orderItemList) {
             orderItemVOList.add(assembleOrderItemVo(orderItem));
         }
-        orderVo.setOrderItemVoList(orderItemVOList);
-        return orderVo;
+        return orderItemVOList;
     }
 
     /**
@@ -377,7 +443,7 @@ public class OrderServiceImpl implements IOrderService {
      * @param order 订单对象
      * @return AlipayF2FPrecreateResult
      */
-    private AlipayTradePrecreateRequestBuilder generatorAliPayResult(Order order) {
+    private AlipayTradePrecreateRequestBuilder generatorAliPayResultBuilder(Order order) {
         //构建订单号 商户网站订单系统中唯一订单号，64个字符以内，只能包含字母、数字、下划线，
         String outOrderNo = order.getOrderNo().toString();
 
@@ -491,5 +557,87 @@ public class OrderServiceImpl implements IOrderService {
                 logger.error("不支持的交易状态，交易返回异常!!!");
                 throw new Exception("不支持的交易状态，交易返回异常!!!");
         }
+    }
+
+    public  SystemResponse<PageInfo> list(Integer userId, Integer pageNum, Integer pageSize) {
+        PageHelper.startPage(pageNum,pageSize);
+        List<Order> orderList = orderMapper.selectByUserId(userId);
+        PageInfo pageInfo = new PageInfo(orderList);
+        List<OrderVo> orderVoList = assembleOrderVoList(orderList);
+        pageInfo.setList(orderVoList);
+        return SystemResponse.createSuccessByData(pageInfo);
+    }
+
+    @Override
+    public SystemResponse<OrderVo> managerOrderDetail(Long orderNo) {
+        Order order = orderMapper.selectByOrderNo(orderNo.toString());
+        if(order == null) {
+            return SystemResponse.createErrorByMsg("没有查询到该订单");
+        }
+        List<OrderItem> orderItemList = orderItemMapper.selectByOrderNo(orderNo);
+        if(orderItemList == null || orderItemList.size() == 0) {
+            return SystemResponse.createErrorByMsg("订单明细为null");
+        }
+        OrderVo orderVo = assembleOrderVo(order,orderItemList);
+        return SystemResponse.createSuccessByData(orderVo);
+    }
+
+    @Override
+    public SystemResponse<PageInfo> managerList(Integer pageNum, Integer pageSize) {
+        PageHelper.startPage(pageNum,pageSize);
+
+        List<Order> orderList = orderMapper.selectAll();
+        List<OrderVo> orderVoList = assembleOrderVoList(orderList);
+
+        PageInfo pageInfo = new PageInfo(orderList);
+        pageInfo.setList(orderVoList);
+
+        return SystemResponse.createSuccessByData(pageInfo);
+    }
+
+    @Override
+    public SystemResponse<PageInfo> orderSearch(Long orderNo, int pageNum, int pageSize) {
+        //TODO 暂时按照订单号精准匹配
+        PageHelper.startPage(pageNum,pageSize);
+        Order order = orderMapper.selectByOrderNo(orderNo.toString());
+        if(order == null) {
+            return SystemResponse.createErrorByMsg("没有查询到相关订单");
+        }
+        List<OrderItem> orderItemList = orderItemMapper.selectByOrderNo(orderNo);
+        if(orderItemList == null || orderItemList.size()==0) {
+            return SystemResponse.createErrorByMsg("没有订单明细");
+        }
+        OrderVo orderVo = assembleOrderVo(order,orderItemList);
+        PageInfo pageInfo = new PageInfo(Lists.newArrayList(order));
+        pageInfo.setList(Lists.newArrayList(orderVo));
+        return SystemResponse.createSuccessByData(pageInfo);
+    }
+
+    @Override
+    public SystemResponse<String> manageSendGoods(Long orderNo) {
+        Order order = orderMapper.selectByOrderNo(orderNo.toString());
+        if(order == null) {
+            return SystemResponse.createErrorByMsg("订单不存在");
+        }
+        order.setStatus(OrderStatusEnum.SHIPPED.getCode());
+        if(orderMapper.updateByPrimaryKey(order)>0) {
+            return SystemResponse.createSuccessByMsg("发货成功");
+        }
+        return SystemResponse.createErrorByMsg("发货失败");
+    }
+
+    /**
+     * 把OrderList  转为orderVoList
+     * @param orderList 把OrderList
+     * @return List<OrderVo>
+     */
+    private List<OrderVo> assembleOrderVoList(List<Order> orderList) {
+        List<OrderVo> orderVoList = Lists.newArrayList();
+        for (Order order: orderList) {
+            List<OrderItem> orderItemList = orderItemMapper.selectByOrderNo(order.getOrderNo());
+            OrderVo orderVo = assembleOrderVo(order,orderItemList);
+            orderVoList.add(orderVo);
+        }
+        return orderVoList;
     }
 }

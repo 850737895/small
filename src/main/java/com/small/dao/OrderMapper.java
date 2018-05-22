@@ -1,7 +1,10 @@
 package com.small.dao;
 
 import com.small.pojo.Order;
+import com.small.vo.OrderVo;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface OrderMapper {
     int deleteByPrimaryKey(Integer id);
@@ -19,4 +22,8 @@ public interface OrderMapper {
     Order selectByUserIdAndOrderNo(@Param("userId")Integer userId,@Param("orderNo")Long orderId);
 
     Order selectByOrderNo(String outOrderNo);
+
+    List<Order> selectByUserId(Integer userId);
+
+    List<Order> selectAll();
 }

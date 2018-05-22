@@ -1,8 +1,11 @@
 package com.small.service;
 
+import com.github.pagehelper.PageInfo;
 import com.small.common.SystemResponse;
+import com.small.vo.OrderProductVo;
 import com.small.vo.OrderVo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -48,4 +51,67 @@ public interface IOrderService {
      * @return SystemResponse<OrderVo>
      */
     SystemResponse<OrderVo> createOrder(Integer userId, Integer shippingId) throws RuntimeException;
+
+    /**
+     * 订单取消接口
+     * @param userId 用户ID
+     * @param orderNo  订单号
+     * @return SystemResponse<String>
+     */
+    SystemResponse<String> cancle(Integer userId, Long orderNo);
+
+    /**
+     * 购物购物车勾选的产品
+     * @param userId 用户ID
+     * @return  SystemResponse<OrderProductVo>
+     */
+    SystemResponse<OrderProductVo> getOrderCartProduct(Integer userId);
+
+    /**
+     * 查询订单详情
+     * @param userId 用户I的
+     * @param orderNo 订单号
+     * @return  SystemResponse<OrderProductVo>
+     */
+    SystemResponse<OrderVo> detail(Integer userId, Long orderNo);
+
+    /**
+     * 查询订单列表
+     * @param userId 用户id
+     * @param pageNum 查询哪一页
+     * @param pageSize  每一页大小
+     * @return  SystemResponse<PageInfo>
+     */
+    SystemResponse<PageInfo> list(Integer userId, Integer pageNum, Integer pageSize);
+
+    /**
+     * 后端管理订单详情
+     * @param orderNo 订单ID
+     * @return SystemResponse<OrderVo>
+     */
+    SystemResponse<OrderVo> managerOrderDetail(Long orderNo);
+
+    /**
+     * 管理后台查询订单列表
+     * @param pageNum 分页下标
+     * @param pageSize 每页的条数
+     * @return  SystemResponse<PageInfo>
+     */
+    SystemResponse<PageInfo> managerList(Integer pageNum, Integer pageSize);
+
+    /**
+     * 订单查询
+     * @param orderNo 订单号
+     * @param pageNum 查询页码
+     * @param pageSize 每页的条数
+     * @return SystemResponse<PageInfo>
+     */
+    SystemResponse<PageInfo> orderSearch(Long orderNo, int pageNum, int pageSize);
+
+    /**
+     * 发货接口
+     * @param orderNo 订单号
+     * @return SystemResponse<String>
+     */
+    SystemResponse<String> manageSendGoods(Long orderNo);
 }

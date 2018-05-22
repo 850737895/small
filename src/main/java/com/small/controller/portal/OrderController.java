@@ -1,17 +1,20 @@
 package com.small.controller.portal;
 
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
 import com.small.common.SystemCode;
 import com.small.common.SystemConst;
 import com.small.common.SystemResponse;
 import com.small.pojo.User;
 import com.small.service.IOrderService;
+import com.small.vo.OrderProductVo;
 import com.small.vo.OrderVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +35,12 @@ public class OrderController {
     @Autowired
     private IOrderService orderServiceImpl;
 
+    /**
+     * 支付订单
+     * @param request request对象
+     * @param orderNo 订单id
+     * @return 付款二维码地址
+     */
     @RequestMapping("/pay.do")
     @ResponseBody
     public SystemResponse<Map<String,String>> pay(HttpServletRequest request,Long orderNo) {
@@ -107,6 +116,8 @@ public class OrderController {
      * @param shippingId 收货地址ID
      * @return SystemResponse<OrderVo>
      */
+    @RequestMapping("/createOrder.do")
+    @ResponseBody
     public SystemResponse<OrderVo> createOrder(HttpSession session,Integer shippingId){
 
         User user = (User) session.getAttribute(SystemConst.CURRENT_USER);
@@ -123,7 +134,64 @@ public class OrderController {
             logger.error("创建订单失败:{}",e.getMessage());
             return SystemResponse.createErrorByMsg(e.getMessage());
         }
+    }
 
+    /**
+     * 订单取消接口
+     * @param session session对象
+     * @param orderNo orderNo对象
+     * @return  SystemResponse<String>
+     */
+    @RequestMapping("/cancle.do")
+    @ResponseBody
+    public SystemResponse<String> cancle(HttpSession session,Long orderNo) {
+        User user = (User) session.getAttribute(SystemConst.CURRENT_USER);
+        if(user == null) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        if(orderNo == null) {
+            return SystemResponse.createErrorByMsg("传入的订单号为null");
+        }
+        return orderServiceImpl.cancle(user.getId(),orderNo);
+    }
 
+    /**
+     * 展示购物车勾选的物品
+     * @param session session
+     * @return SystemResponse<OrderProductVo>
+     */
+    @RequestMapping("/get_order_cart_product.do")
+    @ResponseBody
+    public SystemResponse<OrderProductVo> getOrderCartProduct(HttpSession session) {
+        User user = (User) session.getAttribute(SystemConst.CURRENT_USER);
+        if(user == null) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        return orderServiceImpl.getOrderCartProduct(user.getId());
+    }
+
+    @RequestMapping("/detail.do")
+    @ResponseBody
+    public SystemResponse<OrderVo> detail(HttpSession session,Long orderNo) {
+        User user = (User) session.getAttribute(SystemConst.CURRENT_USER);
+        if(user == null) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        if(orderNo == null) {
+            return SystemResponse.createErrorByMsg("传入的订单号为null");
+        }
+        return orderServiceImpl.detail(user.getId(),orderNo);
+    }
+
+    @RequestMapping("/list.do")
+    @ResponseBody
+    public SystemResponse<PageInfo> list(HttpSession session, @RequestParam(value = "pageNum" ,defaultValue = "1")Integer pageNum,
+                                         @RequestParam(value = "pageSize",defaultValue = "10")Integer pageSize)
+    {
+        User user = (User) session.getAttribute(SystemConst.CURRENT_USER);
+        if(user == null) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        return orderServiceImpl.list(user.getId(),pageNum,pageSize);
     }
 }
