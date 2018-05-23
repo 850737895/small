@@ -172,7 +172,6 @@ public class OrderServiceImpl implements IOrderService {
 
 
     @Transactional
-    @Override
     public SystemResponse<OrderVo> createOrder(Integer userId, Integer shippingId) throws RuntimeException {
         //根据用户ID 查询已经勾选的购物车
         List<Cart> cartList = cartMapper.selectCheckCartByUserId(userId);
@@ -193,7 +192,7 @@ public class OrderServiceImpl implements IOrderService {
         Order order = assembleOrder(userId,shippingId,payment);
 
         int rowCount = orderMapper.insert(order);
-        if(rowCount<0) {
+        if(rowCount>0) {
             throw new RuntimeException("创建订单失败");
         }
         //插入订单明细
