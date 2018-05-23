@@ -192,7 +192,7 @@ public class OrderServiceImpl implements IOrderService {
         Order order = assembleOrder(userId,shippingId,payment);
 
         int rowCount = orderMapper.insert(order);
-        if(rowCount>0) {
+        if(rowCount<=0) {
             throw new RuntimeException("创建订单失败");
         }
         //插入订单明细
@@ -282,7 +282,7 @@ public class OrderServiceImpl implements IOrderService {
         orderVo.setPaymentType(order.getPaymentType());
         orderVo.setPayment(order.getPayment());
         orderVo.setPostage(order.getPostage());
-        orderVo.setStatus(orderVo.getStatus());
+        orderVo.setStatus(order.getStatus());
         orderVo.setPaymentTypeDesc(PaymentType.codeOf(order.getPaymentType()));
         orderVo.setStatusDesc(OrderStatusEnum.codeOf(order.getStatus()));
         orderVo.setShippingId(order.getShippingId());
@@ -487,7 +487,7 @@ public class OrderServiceImpl implements IOrderService {
                 .setUndiscountableAmount(undiscountableAmount).setSellerId(sellerId).setBody(body)
                 .setOperatorId(operatorId).setStoreId(storeId).setExtendParams(extendParams)
                 .setTimeoutExpress(timeoutExpress)
-                //                .setNotifyUrl("http://www.test-notify-url.com")//支付宝服务器主动通知商户服务器里指定的页面http路径,根据需要设置
+                .setNotifyUrl(PropertiesUtil.getPropertyValues("alipay.callback.url",""))
                 .setGoodsDetailList(goodsDetails);
 
         return builder;

@@ -36,7 +36,7 @@ public class OrderManagerController {
      * @param orderNo 订单号
      * @return SystemResponse<OrderVo>
      */
-    @RequestMapping("/detail")
+    @RequestMapping("/detail.do")
     @ResponseBody
     public SystemResponse<OrderVo> detail(HttpSession session, Long orderNo) {
 
@@ -85,7 +85,7 @@ public class OrderManagerController {
      * @param pageSize pageSize
      * @return SystemResponse<PageInfo>
      */
-    @RequestMapping("search.do")
+    @RequestMapping("/search.do")
     @ResponseBody
     public SystemResponse<PageInfo> orderSearch(HttpSession session, Long orderNo, @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                                                 @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
@@ -105,7 +105,7 @@ public class OrderManagerController {
      * @param orderNo 订单号
      * @return SystemResponse<String>
      */
-    @RequestMapping("send_goods.do")
+    @RequestMapping("/send_goods.do")
     @ResponseBody
     public SystemResponse<String> orderSendGoods(HttpSession session, Long orderNo) {
         User user = (User) session.getAttribute(SystemConst.CURRENT_USER);
