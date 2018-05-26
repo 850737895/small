@@ -3,8 +3,7 @@ package com.small.common;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.TimeUnit;
 
@@ -12,9 +11,9 @@ import java.util.concurrent.TimeUnit;
  * 本地guava缓存
  * Created by 85073 on 2018/5/6.
  */
+@Slf4j
 public class TonkenCache {
 
-    public static final Logger logger = LoggerFactory.getLogger(TonkenCache.class);
 
     private static LoadingCache<String,String> localCache = CacheBuilder.newBuilder().initialCapacity(100)
                                                             .maximumSize(10000).expireAfterWrite(12, TimeUnit.HOURS)
@@ -37,7 +36,7 @@ public class TonkenCache {
             }
             return value;
         }catch (Exception e){
-            logger.error("localCache get error",e);
+            log.error("localCache get error",e);
         }
         return null;
     }

@@ -5,8 +5,7 @@ import com.small.service.IFileService;
 import com.small.utils.FTPUtil;
 import com.small.utils.PropertiesUtil;
 import com.small.vo.FileVo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
@@ -19,9 +18,8 @@ import java.util.UUID;
  * Created by 85073 on 2018/5/10.
  */
 @Service
+@Slf4j
 public class FileServiceImpl implements IFileService {
-
-    private static final Logger logger = LoggerFactory.getLogger(FileServiceImpl.class);
 
     @Override
     public FileVo upload(MultipartFile file, String path) {
@@ -29,7 +27,7 @@ public class FileServiceImpl implements IFileService {
         String fileName = file.getOriginalFilename();
         String fileSuffix = fileName.substring(fileName.lastIndexOf(".")+1);
         String targetFileName = UUID.randomUUID().toString()+"."+fileSuffix;
-        logger.info("文件上传名:{}文件上传路径:{} 新文件名:{}",fileName,path,targetFileName);
+        log.info("文件上传名:{}文件上传路径:{} 新文件名:{}",fileName,path,targetFileName);
         //创建文件所在的路径
         File targetDir = new File(path);
         if(!targetDir.exists()) {
@@ -48,7 +46,7 @@ public class FileServiceImpl implements IFileService {
             fileVo.setFileName(targetFileName);
             fileVo.setUrl(PropertiesUtil.getPropertyValues("ftp.server.http.prefix","http://img.small.com//images/")+targetFileName);
         } catch (IOException e) {
-            logger.error("上传图片异常{}",e.getMessage());
+            log.error("上传图片异常{}",e.getMessage());
             return null;
         }
         return fileVo;

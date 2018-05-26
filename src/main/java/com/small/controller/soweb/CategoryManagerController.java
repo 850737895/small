@@ -5,9 +5,8 @@ import com.small.common.SystemResponse;
 import com.small.pojo.Category;
 import com.small.pojo.User;
 import com.small.service.ICategoryService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,9 +23,8 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/manager/category")
+@Slf4j
 public class CategoryManagerController {
-
-    private static final Logger logger = LoggerFactory.getLogger(CategoryManagerController.class);
 
     @Autowired
     private ICategoryService categoryServiceImpl;
@@ -43,7 +41,7 @@ public class CategoryManagerController {
                                       @RequestParam("categoryName")String categoryName, HttpSession session) {
 
         if(StringUtils.isBlank(categoryName)) {
-            logger.error("参数:categoryName为空:{}",categoryName);
+            log.error("参数:categoryName为空:{}",categoryName);
             return SystemResponse.createErrorByMsg(SystemConst.ARGS_ERROR);
         }
         User user = (User) session.getAttribute(SystemConst.CURRENT_USER);
@@ -70,7 +68,7 @@ public class CategoryManagerController {
                                                      @RequestParam("categoryName") String categoryName,
                                                      HttpSession session){
         if(StringUtils.isBlank(categoryName) || categoryId == null) {
-            logger.error("参数:categoryName为空:{}",categoryName);
+            log.error("参数:categoryName为空:{}",categoryName);
             return SystemResponse.createErrorByMsg(SystemConst.ARGS_ERROR);
         }
         User user = (User) session.getAttribute(SystemConst.CURRENT_USER);
@@ -94,7 +92,7 @@ public class CategoryManagerController {
     @ResponseBody
     public SystemResponse<List<Category>> getCategoryByParentId(Integer categoryId,HttpSession session) {
         if( categoryId == null) {
-            logger.error("参数:categoryId:{}",categoryId);
+            log.error("参数:categoryId:{}",categoryId);
             return SystemResponse.createErrorByMsg(SystemConst.ARGS_ERROR);
         }
         User user = (User) session.getAttribute(SystemConst.CURRENT_USER);

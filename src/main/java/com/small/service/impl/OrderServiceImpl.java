@@ -27,9 +27,8 @@ import com.small.vo.OrderItemVo;
 import com.small.vo.OrderProductVo;
 import com.small.vo.OrderVo;
 import com.small.vo.ShippingVo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,9 +46,9 @@ import java.util.Random;
  * Created by 85073 on 2018/5/20.
  */
 @Service
+@Slf4j
 public class OrderServiceImpl implements IOrderService {
 
-    public static final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     @Autowired
     private OrderMapper orderMapper;
@@ -102,7 +101,7 @@ public class OrderServiceImpl implements IOrderService {
             String qrUrl = dealAliPayStatus(result,path);
             retMap.put("qrPath",qrUrl);
         } catch (Exception e) {
-            logger.error("异常信息:{}",e.getMessage());
+            log.error("异常信息:{}",e.getMessage());
             return SystemResponse.createErrorByMsg(e.getMessage());
         }
         return SystemResponse.createSuccessByData(retMap);
@@ -428,12 +427,12 @@ public class OrderServiceImpl implements IOrderService {
     // 简单打印应答
     private void dumpResponse(AlipayResponse response) {
         if (response != null) {
-            logger.info(String.format("code:%s, msg:%s", response.getCode(), response.getMsg()));
+            log.info(String.format("code:%s, msg:%s", response.getCode(), response.getMsg()));
             if (StringUtils.isNotEmpty(response.getSubCode())) {
-                logger.info(String.format("subCode:%s, subMsg:%s", response.getSubCode(),
+                log.info(String.format("subCode:%s, subMsg:%s", response.getSubCode(),
                         response.getSubMsg()));
             }
-            logger.info("body:" + response.getBody());
+            log.info("body:" + response.getBody());
         }
     }
 
@@ -519,7 +518,7 @@ public class OrderServiceImpl implements IOrderService {
     private String dealAliPayStatus( AlipayF2FPrecreateResult result,String path ) throws Exception {
         switch (result.getTradeStatus()) {
             case SUCCESS:
-                logger.info("支付宝预下单成功: )");
+                log.info("支付宝预下单成功: )");
                 AlipayTradePrecreateResponse response = result.getResponse();
                 dumpResponse(response);
 
@@ -539,21 +538,21 @@ public class OrderServiceImpl implements IOrderService {
                 try {
                     FTPUtil.updateFile(Lists.newArrayList(targetFile));
                 } catch (IOException e) {
-                    logger.error("上传二维码异常",e);
+                    log.error("上传二维码异常",e);
                 }
-                logger.info("qrPath:" + qrPath);
+                log.info("qrPath:" + qrPath);
                 String qrUrl = PropertiesUtil.getPropertyValues("ftp.server.http.prefix","http://47.104.128.12/images/")+targetFile.getName();
                 return qrUrl;
             case FAILED:
-                logger.error("支付宝预下单失败!!!");
+                log.error("支付宝预下单失败!!!");
                 throw new Exception("支付宝预下单失败!!!");
 
             case UNKNOWN:
-                logger.error("系统异常，预下单状态未知!!!");
+                log.error("系统异常，预下单状态未知!!!");
                 throw new Exception("系统异常，预下单状态未知!!!");
 
             default:
-                logger.error("不支持的交易状态，交易返回异常!!!");
+                log.error("不支持的交易状态，交易返回异常!!!");
                 throw new Exception("不支持的交易状态，交易返回异常!!!");
         }
     }

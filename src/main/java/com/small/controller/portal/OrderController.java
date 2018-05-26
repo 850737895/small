@@ -9,8 +9,7 @@ import com.small.pojo.User;
 import com.small.service.IOrderService;
 import com.small.vo.OrderProductVo;
 import com.small.vo.OrderVo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,9 +27,9 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/order")
+@Slf4j
 public class OrderController {
 
-    private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
 
     @Autowired
     private IOrderService orderServiceImpl;
@@ -83,7 +82,7 @@ public class OrderController {
         try {
             return orderServiceImpl.aliPayCallBack(resolverMap);
         }catch (Exception e) {
-            logger.error("异常:{}",e.getMessage());
+            log.error("异常:{}",e.getMessage());
             return "failed";
         }
     }
@@ -131,7 +130,7 @@ public class OrderController {
         try {
             return orderServiceImpl.createOrder(user.getId(),shippingId);
         }catch (Exception e) {
-            logger.error("创建订单失败:{}",e.getMessage());
+            log.error("创建订单失败:{}",e.getMessage());
             return SystemResponse.createErrorByMsg(e.getMessage());
         }
     }

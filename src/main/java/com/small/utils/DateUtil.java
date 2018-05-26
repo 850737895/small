@@ -1,11 +1,10 @@
 package com.small.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
@@ -14,9 +13,9 @@ import java.util.Date;
  * 日期工具类
  * Created by 85073 on 2018/5/9.
  */
+@Slf4j
 public class DateUtil {
 
-    private static final Logger logger = LoggerFactory.getLogger(DateUtil.class);
 
     public static final String FORMAT = "yyyy-MM-dd HH:mm:ss";
 
@@ -57,7 +56,7 @@ public class DateUtil {
      */
     public static String date2DateStr(Date date,String format) {
         if(date == null) {
-            logger.error("传入的需要格式化字符串为null");
+            log.error("传入的需要格式化字符串为null");
             return StringUtils.EMPTY;
         }
         DateTime dateTime = new DateTime();
@@ -72,7 +71,7 @@ public class DateUtil {
      */
     public static String date2DateStr(Date date) {
         if(date == null) {
-            logger.error("传入的日期对象为null");
+            log.error("传入的日期对象为null");
             return StringUtils.EMPTY;
         }
         DateTime dateTime = new DateTime();
