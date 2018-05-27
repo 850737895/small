@@ -44,10 +44,10 @@ public class FTPUtil {
         if(connectFtpServer()) {
             try {
                 //切换工作路径
-                ftpClient.changeWorkingDirectory(remotePath);
+                boolean flag = ftpClient.changeWorkingDirectory(remotePath);
                 ftpClient.setBufferSize(1024);
                 ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
-                ftpClient.enterLocalPassiveMode();
+                //ftpClient.enterLocalPassiveMode();
                 for (File fileItem: fileList) {
                     fis = new FileInputStream(fileItem);
                     ftpClient.storeFile(fileItem.getName(),fis);

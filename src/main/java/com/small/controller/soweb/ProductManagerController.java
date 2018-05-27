@@ -159,6 +159,9 @@ public class ProductManagerController {
         if(!userServiceImpl.checkAmdinRole(user)) {
             return SystemResponse.createErrorByMsg(SystemConst.NOT_ADMIN_AUTH);
         }
+        if(file.getSize() == 0) {
+            return SystemResponse.createErrorByMsg("上传文件为空");
+        }
         String path = request.getServletContext().getRealPath("upload");
         FileVo fileVo =fileServiceImpl.upload(file,path);
         if(fileVo == null) {

@@ -40,7 +40,9 @@ public class FileServiceImpl implements IFileService {
             file.transferTo(targetFile);
 
             //上传到ftp服务器
-            FTPUtil.updateFile(Lists.newArrayList(targetFile));
+            if(!FTPUtil.updateFile(Lists.newArrayList(targetFile))){
+                return null;
+            }
             //删除应用服务器的图片
             targetFile.delete();
             fileVo.setFileName(targetFileName);
