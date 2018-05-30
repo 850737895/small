@@ -8,6 +8,7 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class User {
     private Integer id;
 
