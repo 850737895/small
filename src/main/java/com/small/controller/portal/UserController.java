@@ -1,10 +1,14 @@
 package com.small.controller.portal;
 
+import com.small.common.CookieUtil;
 import com.small.common.SystemCode;
 import com.small.common.SystemConst;
 import com.small.common.SystemResponse;
 import com.small.pojo.User;
 import com.small.service.IUserService;
+import com.small.utils.JsonUtil;
+import com.small.utils.RedisPoolUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -36,10 +42,15 @@ public class UserController {
     @ResponseBody
     public SystemResponse<User> login(@RequestParam("username")String userName,
                                       @RequestParam("password")String password,
-                                      HttpSession httpSession) {
+                                      HttpSession httpSession,
+                                      HttpServletResponse response)
+    {
+        String token = httpSession.getId();
         SystemResponse<User> userSystemResponse = userServiceImpl.doLogin(userName,password);
         if(userSystemResponse.isSuccess()) {
-            httpSession.setAttribute(SystemConst.CURRENT_USER,userSystemResponse.getData());
+            String userStr = JsonUtil.obj2Str(userSystemResponse.getData());
+            RedisPoolUtil.setex(httpSession.getId(),SystemConst.SessionCacheTime.SESSION_IN_REDIS_EXPIRE,userStr);
+            CookieUtil.writeCookie(response,token);
         }
         return userSystemResponse;
     }
@@ -81,13 +92,23 @@ public class UserController {
 
     /**
      * 获取用户的信息
-     * @param session session
+     * @param request request
      * @return SystemResponse
      */
     @RequestMapping(value = "/get_user_info.do",method = RequestMethod.POST)
     @ResponseBody
-    public SystemResponse<User> getUserInfo(HttpSession session) {
-        User user = (User) session.getAttribute(SystemConst.CURRENT_USER);
+    public SystemResponse<User> getUserInfo(HttpServletRequest request) {
+
+        String cookieValue = CookieUtil.readCookie(request);
+
+        if(StringUtils.isBlank(cookieValue)) {
+            return SystemResponse.createErrorByMsg(SystemConst.USER_NOT_LOGIN);
+        }
+        String userStr = RedisPoolUtil.get(cookieValue);
+        if(StringUtils.isBlank(userStr)) {
+            return SystemResponse.createErrorByMsg("用户session以失效,请重新登录");
+        }
+        User user = JsonUtil.str2Obj(userStr,User.class);
         if(null == user) {
             return SystemResponse.createErrorByMsg(SystemConst.USER_NOT_LOGIN);
         }

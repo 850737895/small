@@ -108,12 +108,13 @@ public class JsonUtil {
         }
     }
 
-    public static <T> T str2Obj(String objStr, JavaType javaType) {
-        if(StringUtils.isEmpty(objStr) || javaType == null) {
+    public static <T> T str2Obj(String objStr, Class<?> collectionsClass,Class<?>...elementsClass) {
+        JavaType javaType = objectMapper.getTypeFactory().constructParametricType(collectionsClass,elementsClass);
+        try {
+            return objectMapper.readValue(objStr,javaType);
+        } catch (Exception e) {
+            log.warn("反序列化对象:{},collectionsClass:{},elementsClass:{},原因:{} ",objStr,collectionsClass,elementsClass,e);
             return null;
-        }
-        if(javaType.get == String.class) {
-            return (T)objStr;
         }
     }
 
@@ -158,6 +159,8 @@ public class JsonUtil {
 
         String listStr = obj2StrPretty(list);
         List<User> list2 = str2Obj(listStr, new TypeReference<List<User>>() {});
+        List<User> list3 = str2Obj(listStr,List.class,User.class);
+        System.out.println(list3);
         System.out.println(list2);
         System.out.println(str2Obj("2.5", new TypeReference<Float>() {}));
         Float  text= str2Obj("2.5", new TypeReference<Float>() {});
