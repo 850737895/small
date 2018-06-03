@@ -2,14 +2,18 @@ package com.small.controller.portal;
 
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
+import com.small.common.CookieUtil;
 import com.small.common.SystemCode;
 import com.small.common.SystemConst;
 import com.small.common.SystemResponse;
 import com.small.pojo.User;
 import com.small.service.IOrderService;
+import com.small.utils.JsonUtil;
+import com.small.utils.RedisPoolUtil;
 import com.small.vo.OrderProductVo;
 import com.small.vo.OrderVo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,10 +47,16 @@ public class OrderController {
     @RequestMapping("/pay.do")
     @ResponseBody
     public SystemResponse<Map<String,String>> pay(HttpServletRequest request,Long orderNo) {
-        HttpSession session = request.getSession();
-        User user = (User) session.getAttribute(SystemConst.CURRENT_USER);
-
-        if(user == null) {
+        String tooken = CookieUtil.readCookie(request);
+        if(StringUtils.isBlank(tooken)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        String userStr = RedisPoolUtil.get(tooken);
+        if(StringUtils.isBlank(userStr)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        User user = JsonUtil.str2Obj(userStr,User.class);
+        if (null == user) {
             return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
         }
         if(orderNo == null) {
@@ -137,15 +147,23 @@ public class OrderController {
 
     /**
      * 订单取消接口
-     * @param session session对象
+     * @param request request
      * @param orderNo orderNo对象
      * @return  SystemResponse<String>
      */
     @RequestMapping("/cancle.do")
     @ResponseBody
-    public SystemResponse<String> cancle(HttpSession session,Long orderNo) {
-        User user = (User) session.getAttribute(SystemConst.CURRENT_USER);
-        if(user == null) {
+    public SystemResponse<String> cancle(HttpServletRequest request,Long orderNo) {
+        String tooken = CookieUtil.readCookie(request);
+        if(StringUtils.isBlank(tooken)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        String userStr = RedisPoolUtil.get(tooken);
+        if(StringUtils.isBlank(userStr)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        User user = JsonUtil.str2Obj(userStr,User.class);
+        if (null == user) {
             return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
         }
         if(orderNo == null) {
@@ -156,14 +174,22 @@ public class OrderController {
 
     /**
      * 展示购物车勾选的物品
-     * @param session session
+     * @param request request
      * @return SystemResponse<OrderProductVo>
      */
     @RequestMapping("/get_order_cart_product.do")
     @ResponseBody
-    public SystemResponse<OrderProductVo> getOrderCartProduct(HttpSession session) {
-        User user = (User) session.getAttribute(SystemConst.CURRENT_USER);
-        if(user == null) {
+    public SystemResponse<OrderProductVo> getOrderCartProduct(HttpServletRequest request) {
+        String tooken = CookieUtil.readCookie(request);
+        if(StringUtils.isBlank(tooken)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        String userStr = RedisPoolUtil.get(tooken);
+        if(StringUtils.isBlank(userStr)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        User user = JsonUtil.str2Obj(userStr,User.class);
+        if (null == user) {
             return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
         }
         return orderServiceImpl.getOrderCartProduct(user.getId());
@@ -171,9 +197,17 @@ public class OrderController {
 
     @RequestMapping("/detail.do")
     @ResponseBody
-    public SystemResponse<OrderVo> detail(HttpSession session,Long orderNo) {
-        User user = (User) session.getAttribute(SystemConst.CURRENT_USER);
-        if(user == null) {
+    public SystemResponse<OrderVo> detail(HttpServletRequest request,Long orderNo) {
+        String tooken = CookieUtil.readCookie(request);
+        if(StringUtils.isBlank(tooken)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        String userStr = RedisPoolUtil.get(tooken);
+        if(StringUtils.isBlank(userStr)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        User user = JsonUtil.str2Obj(userStr,User.class);
+        if (null == user) {
             return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
         }
         if(orderNo == null) {
@@ -184,11 +218,19 @@ public class OrderController {
 
     @RequestMapping("/list.do")
     @ResponseBody
-    public SystemResponse<PageInfo> list(HttpSession session, @RequestParam(value = "pageNum" ,defaultValue = "1")Integer pageNum,
+    public SystemResponse<PageInfo> list(HttpServletRequest request, @RequestParam(value = "pageNum" ,defaultValue = "1")Integer pageNum,
                                          @RequestParam(value = "pageSize",defaultValue = "10")Integer pageSize)
     {
-        User user = (User) session.getAttribute(SystemConst.CURRENT_USER);
-        if(user == null) {
+        String tooken = CookieUtil.readCookie(request);
+        if(StringUtils.isBlank(tooken)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        String userStr = RedisPoolUtil.get(tooken);
+        if(StringUtils.isBlank(userStr)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        User user = JsonUtil.str2Obj(userStr,User.class);
+        if (null == user) {
             return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
         }
         return orderServiceImpl.list(user.getId(),pageNum,pageSize);

@@ -70,6 +70,9 @@ public class CookieUtil {
             for (Cookie cookie: cookies) {
                 if(StringUtils.equals(cookie.getName(),COOKIE_NAME)) {
                     cookie.setMaxAge(COOKIE_DEL_FLAG);
+                    cookie.setHttpOnly(true);
+                    cookie.setPath("/");
+                    cookie.setDomain(COOKIE_DOMAIN);
                     response.addCookie(cookie);
                     return;
                 }

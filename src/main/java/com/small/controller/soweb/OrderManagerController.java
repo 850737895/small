@@ -1,18 +1,24 @@
 package com.small.controller.soweb;
 
 import com.github.pagehelper.PageInfo;
+import com.small.common.CookieUtil;
+import com.small.common.SystemCode;
 import com.small.common.SystemConst;
 import com.small.common.SystemResponse;
 import com.small.pojo.User;
 import com.small.service.IOrderService;
 import com.small.service.IUserService;
+import com.small.utils.JsonUtil;
+import com.small.utils.RedisPoolUtil;
 import com.small.vo.OrderVo;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -32,16 +38,24 @@ public class OrderManagerController {
     /**
      * 后端订单详情
      *
-     * @param session session
+     * @param request request
      * @param orderNo 订单号
      * @return SystemResponse<OrderVo>
      */
     @RequestMapping("/detail.do")
     @ResponseBody
-    public SystemResponse<OrderVo> detail(HttpSession session, Long orderNo) {
+    public SystemResponse<OrderVo> detail(HttpServletRequest request, Long orderNo) {
 
-        User user = (User) session.getAttribute(SystemConst.CURRENT_USER);
-        if (null == user) {
+        String tooken = CookieUtil.readCookie(request);
+        if(StringUtils.isBlank(tooken)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        String userStr = RedisPoolUtil.get(tooken);
+        if(StringUtils.isBlank(userStr)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        User user = JsonUtil.str2Obj(userStr,User.class);
+        if(null == user) {
             return SystemResponse.createErrorByMsg(SystemConst.USER_NOT_LOGIN);
         }
         if (!userServiceImpl.checkAmdinRole(user)) {
@@ -57,17 +71,25 @@ public class OrderManagerController {
     /**
      * 后端列表查询
      *
-     * @param session  session
+     * @param request  request
      * @param pageNum  pageNum
      * @param pageSize pageSize
      * @return SystemResponse<PageInfo>
      */
     @RequestMapping("/list.do")
     @ResponseBody
-    public SystemResponse<PageInfo> list(HttpSession session, @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
+    public SystemResponse<PageInfo> list(HttpServletRequest request, @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
                                          @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
-        User user = (User) session.getAttribute(SystemConst.CURRENT_USER);
-        if (null == user) {
+        String tooken = CookieUtil.readCookie(request);
+        if(StringUtils.isBlank(tooken)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        String userStr = RedisPoolUtil.get(tooken);
+        if(StringUtils.isBlank(userStr)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        User user = JsonUtil.str2Obj(userStr,User.class);
+        if(null == user) {
             return SystemResponse.createErrorByMsg(SystemConst.USER_NOT_LOGIN);
         }
         if (!userServiceImpl.checkAmdinRole(user)) {
@@ -79,7 +101,7 @@ public class OrderManagerController {
     /**
      * 后端订单查询
      *
-     * @param session  session
+     * @param request  request
      * @param orderNo  订单号
      * @param pageNum  pageNum
      * @param pageSize pageSize
@@ -87,10 +109,18 @@ public class OrderManagerController {
      */
     @RequestMapping("/search.do")
     @ResponseBody
-    public SystemResponse<PageInfo> orderSearch(HttpSession session, Long orderNo, @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+    public SystemResponse<PageInfo> orderSearch(HttpServletRequest request, Long orderNo, @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                                                 @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
-        User user = (User) session.getAttribute(SystemConst.CURRENT_USER);
-        if (null == user) {
+        String tooken = CookieUtil.readCookie(request);
+        if(StringUtils.isBlank(tooken)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        String userStr = RedisPoolUtil.get(tooken);
+        if(StringUtils.isBlank(userStr)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        User user = JsonUtil.str2Obj(userStr,User.class);
+        if(null == user) {
             return SystemResponse.createErrorByMsg(SystemConst.USER_NOT_LOGIN);
         }
         if (!userServiceImpl.checkAmdinRole(user)) {
@@ -101,15 +131,23 @@ public class OrderManagerController {
 
     /**
      * 订单发货管理
-     * @param session session
+     * @param request request
      * @param orderNo 订单号
      * @return SystemResponse<String>
      */
     @RequestMapping("/send_goods.do")
     @ResponseBody
-    public SystemResponse<String> orderSendGoods(HttpSession session, Long orderNo) {
-        User user = (User) session.getAttribute(SystemConst.CURRENT_USER);
-        if (null == user) {
+    public SystemResponse<String> orderSendGoods(HttpServletRequest request, Long orderNo) {
+        String tooken = CookieUtil.readCookie(request);
+        if(StringUtils.isBlank(tooken)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        String userStr = RedisPoolUtil.get(tooken);
+        if(StringUtils.isBlank(userStr)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        User user = JsonUtil.str2Obj(userStr,User.class);
+        if(null == user) {
             return SystemResponse.createErrorByMsg(SystemConst.USER_NOT_LOGIN);
         }
         if (!userServiceImpl.checkAmdinRole(user)) {
