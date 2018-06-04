@@ -116,4 +116,8 @@ public class SystemConst {
         Integer WX_PAY = 2;
     }
 
+    public interface RedisCacheTime{
+        Integer SESSION_EXPIRE_TIME = 60*30;
+    }
+
 }

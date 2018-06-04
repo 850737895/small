@@ -108,12 +108,13 @@ public class JsonUtil {
         }
     }
 
-    public static <T> T str2Obj(String objStr, JavaType javaType) {
-        if(StringUtils.isEmpty(objStr) || javaType == null) {
+    public static <T> T string2Obj(String str,Class<?> collectionClass,Class<?>... elementClasses){
+        JavaType javaType = objectMapper.getTypeFactory().constructParametricType(collectionClass,elementClasses);
+        try {
+            return objectMapper.readValue(str,javaType);
+        } catch (Exception e) {
+            log.warn("Parse String to Object error",e);
             return null;
-        }
-        if(javaType.get == String.class) {
-            return (T)objStr;
         }
     }
 
