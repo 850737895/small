@@ -1,5 +1,7 @@
 package com.small.controller.soweb;
 
+import com.small.common.CookieUtil;
+import com.small.common.SystemCode;
 import com.small.common.SystemConst;
 import com.small.common.SystemResponse;
 import com.small.pojo.Product;
@@ -7,9 +9,12 @@ import com.small.pojo.User;
 import com.small.service.IFileService;
 import com.small.service.IProductService;
 import com.small.service.IUserService;
+import com.small.utils.JsonUtil;
+import com.small.utils.RedisPoolUtil;
 import com.small.vo.FileVo;
 import com.small.vo.ProductDetailVo;
 import com.small.vo.RichTextVo;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,15 +44,23 @@ public class ProductManagerController {
 
     /**
      * 新增或修改产品信息
-     * @param session  session
+     * @param request  request
      * @param product product
      * @return saveOrUpdateProduct
      */
     @RequestMapping(value = "/save.do",method = RequestMethod.POST)
     @ResponseBody
-    public SystemResponse<String> saveOrUpdateProduct(HttpSession session,Product product) {
-        User user = (User) session.getAttribute(SystemConst.CURRENT_USER);
-        if (null == user) {
+    public SystemResponse<String> saveOrUpdateProduct(HttpServletRequest request,Product product) {
+        String tooken = CookieUtil.readCookie(request);
+        if(StringUtils.isBlank(tooken)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        String userStr = RedisPoolUtil.get(tooken);
+        if(StringUtils.isBlank(userStr)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        User user = JsonUtil.str2Obj(userStr,User.class);
+        if(null == user) {
             return SystemResponse.createErrorByMsg(SystemConst.USER_NOT_LOGIN);
         }
         if(!userServiceImpl.checkAmdinRole(user)) {
@@ -58,17 +71,25 @@ public class ProductManagerController {
 
     /**
      * 产品上下架功能
-     * @param session session
+     * @param request request
      * @param status status
      * @param productId productId
      * @return SystemResponse
      */
     @RequestMapping(value = "/set_sale_status.do",method = RequestMethod.POST)
     @ResponseBody
-    public SystemResponse<String> modifyProductStatus(HttpSession session, @RequestParam(value = "status",defaultValue = "1")
+    public SystemResponse<String> modifyProductStatus(HttpServletRequest request, @RequestParam(value = "status",defaultValue = "1")
                                                     Integer status, Integer productId) {
-        User user = (User) session.getAttribute(SystemConst.CURRENT_USER);
-        if (null == user) {
+        String tooken = CookieUtil.readCookie(request);
+        if(StringUtils.isBlank(tooken)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        String userStr = RedisPoolUtil.get(tooken);
+        if(StringUtils.isBlank(userStr)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        User user = JsonUtil.str2Obj(userStr,User.class);
+        if(null == user) {
             return SystemResponse.createErrorByMsg(SystemConst.USER_NOT_LOGIN);
         }
         if(!userServiceImpl.checkAmdinRole(user)) {
@@ -79,15 +100,23 @@ public class ProductManagerController {
 
     /**
      * 获取产品详情
-     * @param session session
+     * @param request request
      * @param productId 产品
      * @return SystemResponse<ProductDetailVo>
      */
     @RequestMapping(value = "/detail.do",method = RequestMethod.POST)
     @ResponseBody
-    public SystemResponse<ProductDetailVo> productDetail(HttpSession session, Integer productId ) {
-        User user = (User) session.getAttribute(SystemConst.CURRENT_USER);
-        if (null == user) {
+    public SystemResponse<ProductDetailVo> productDetail(HttpServletRequest request, Integer productId ) {
+        String tooken = CookieUtil.readCookie(request);
+        if(StringUtils.isBlank(tooken)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        String userStr = RedisPoolUtil.get(tooken);
+        if(StringUtils.isBlank(userStr)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        User user = JsonUtil.str2Obj(userStr,User.class);
+        if(null == user) {
             return SystemResponse.createErrorByMsg(SystemConst.USER_NOT_LOGIN);
         }
         if(!userServiceImpl.checkAmdinRole(user)) {
@@ -98,18 +127,26 @@ public class ProductManagerController {
 
     /**
      * 查询列表
-     * @param session  session
+     * @param request  request
      * @param pageNum 查询页
      * @param pageSize 每页大小
      * @return productList
      */
     @RequestMapping("/list.do")
     @ResponseBody
-    public SystemResponse productList(HttpSession session,
+    public SystemResponse productList(HttpServletRequest request,
                                       @RequestParam(value = "pageNum",defaultValue = "1") Integer pageNum,
                                       @RequestParam(value = "pageSize",defaultValue = "10") Integer pageSize) {
-        User user = (User) session.getAttribute(SystemConst.CURRENT_USER);
-        if (null == user) {
+        String tooken = CookieUtil.readCookie(request);
+        if(StringUtils.isBlank(tooken)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        String userStr = RedisPoolUtil.get(tooken);
+        if(StringUtils.isBlank(userStr)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        User user = JsonUtil.str2Obj(userStr,User.class);
+        if(null == user) {
             return SystemResponse.createErrorByMsg(SystemConst.USER_NOT_LOGIN);
         }
         if(!userServiceImpl.checkAmdinRole(user)) {
@@ -120,7 +157,7 @@ public class ProductManagerController {
 
     /**
      * 产品搜索功能
-     * @param session  session
+     * @param request  request
      * @param productName 产品名称
      * @param productId 产品id
      * @param pageNum 页码
@@ -129,11 +166,19 @@ public class ProductManagerController {
      */
     @RequestMapping("/search.do")
     @ResponseBody
-    public SystemResponse productSearch(HttpSession session,String productName,Integer productId,
+    public SystemResponse productSearch(HttpServletRequest request,String productName,Integer productId,
                                       @RequestParam(value = "pageNum",defaultValue = "1") Integer pageNum,
                                       @RequestParam(value = "pageSize",defaultValue = "10") Integer pageSize) {
-        User user = (User) session.getAttribute(SystemConst.CURRENT_USER);
-        if (null == user) {
+        String tooken = CookieUtil.readCookie(request);
+        if(StringUtils.isBlank(tooken)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        String userStr = RedisPoolUtil.get(tooken);
+        if(StringUtils.isBlank(userStr)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        User user = JsonUtil.str2Obj(userStr,User.class);
+        if(null == user) {
             return SystemResponse.createErrorByMsg(SystemConst.USER_NOT_LOGIN);
         }
         if(!userServiceImpl.checkAmdinRole(user)) {
@@ -151,9 +196,16 @@ public class ProductManagerController {
     @RequestMapping("/upload.do")
     @ResponseBody
     public SystemResponse<FileVo> fileUpload(HttpServletRequest request, @RequestParam(value = "upload_file",required = false) MultipartFile file) {
-        HttpSession session = request.getSession();
-        User user  = (User) session.getAttribute(SystemConst.CURRENT_USER);
-        if (null == user) {
+        String tooken = CookieUtil.readCookie(request);
+        if(StringUtils.isBlank(tooken)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        String userStr = RedisPoolUtil.get(tooken);
+        if(StringUtils.isBlank(userStr)) {
+            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
+        }
+        User user = JsonUtil.str2Obj(userStr,User.class);
+        if(null == user) {
             return SystemResponse.createErrorByMsg(SystemConst.USER_NOT_LOGIN);
         }
         if(!userServiceImpl.checkAmdinRole(user)) {
@@ -182,8 +234,15 @@ public class ProductManagerController {
     public RichTextVo richtextImgUpload(HttpServletRequest request,@RequestParam(value = "upload_file",required = false) MultipartFile file, HttpServletResponse response ) {
         RichTextVo richTextVo = new RichTextVo();
         richTextVo.setSuccess(false);
-        HttpSession session = request.getSession();
-        User user  = (User) session.getAttribute(SystemConst.CURRENT_USER);
+        String tooken = CookieUtil.readCookie(request);
+        if(StringUtils.isBlank(tooken)) {
+            richTextVo.setMsg(SystemConst.USER_NOT_LOGIN);
+        }
+        String userStr = RedisPoolUtil.get(tooken);
+        if(StringUtils.isBlank(userStr)) {
+            richTextVo.setMsg(SystemConst.USER_NOT_LOGIN);
+        }
+        User user = JsonUtil.str2Obj(userStr,User.class);
         if (null == user) {
             richTextVo.setMsg(SystemConst.USER_NOT_LOGIN);
         }

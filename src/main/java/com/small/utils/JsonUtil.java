@@ -108,12 +108,21 @@ public class JsonUtil {
         }
     }
 
+<<<<<<< HEAD
     public static <T> T string2Obj(String str,Class<?> collectionClass,Class<?>... elementClasses){
         JavaType javaType = objectMapper.getTypeFactory().constructParametricType(collectionClass,elementClasses);
         try {
             return objectMapper.readValue(str,javaType);
         } catch (Exception e) {
             log.warn("Parse String to Object error",e);
+=======
+    public static <T> T str2Obj(String objStr, Class<?> collectionsClass,Class<?>...elementsClass) {
+        JavaType javaType = objectMapper.getTypeFactory().constructParametricType(collectionsClass,elementsClass);
+        try {
+            return objectMapper.readValue(objStr,javaType);
+        } catch (Exception e) {
+            log.warn("反序列化对象:{},collectionsClass:{},elementsClass:{},原因:{} ",objStr,collectionsClass,elementsClass,e);
+>>>>>>> cd5de35ad5b89501bbe185d86d47434607c4c23c
             return null;
         }
     }
@@ -159,6 +168,8 @@ public class JsonUtil {
 
         String listStr = obj2StrPretty(list);
         List<User> list2 = str2Obj(listStr, new TypeReference<List<User>>() {});
+        List<User> list3 = str2Obj(listStr,List.class,User.class);
+        System.out.println(list3);
         System.out.println(list2);
         System.out.println(str2Obj("2.5", new TypeReference<Float>() {}));
         Float  text= str2Obj("2.5", new TypeReference<Float>() {});
