@@ -1,6 +1,6 @@
 package com.small.controller.portal;
 
-import com.small.common.CookieUtil;
+import com.small.utils.CookieUtil;
 import com.small.common.SystemCode;
 import com.small.common.SystemConst;
 import com.small.common.SystemResponse;

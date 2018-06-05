@@ -230,13 +230,6 @@ public class RedisPoolUtil {
         set("sex","男");
         setex("age",600,"18");
         System.out.println(get("sex"));
-        isExists("age");
-        expire("sex",2000);
-        incr("age");
-        incrBy("age",5);
-        decr("age");
-        decrBy("age",2);
-        del("age");
     }
 
 

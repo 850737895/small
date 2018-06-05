@@ -1,5 +1,6 @@
 package com.small.common;
 
+import com.small.utils.JsonUtil;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -89,6 +90,10 @@ public class SystemResponse<T> implements Serializable{
 
     public static <T> SystemResponse<T> createErrorByCodeMsg(Integer errorCode,String msg) {
         return new SystemResponse<T>(errorCode,msg);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(JsonUtil.obj2StrPretty(SystemResponse.createErrorByCodeMsg(10,"111")));
     }
 
 }

@@ -1,6 +1,6 @@
 package com.small.controller.soweb;
 
-import com.small.common.CookieUtil;
+import com.small.utils.CookieUtil;
 import com.small.common.SystemConst;
 import com.small.common.SystemResponse;
 import com.small.pojo.User;

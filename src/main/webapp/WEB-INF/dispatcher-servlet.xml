@@ -38,4 +38,12 @@
         <property name="maxInMemorySize" value="4096" />
         <property name="defaultEncoding" value="UTF-8"></property>
     </bean>
+    
+    <!--配置拦截器-->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/manager/**"/>
+            <bean class="com.small.interceptors.AuthManagerInterceptor"></bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
 </beans>

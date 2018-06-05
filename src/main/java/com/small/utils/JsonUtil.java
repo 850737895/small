@@ -28,7 +28,7 @@ public class JsonUtil {
 
     static {
         //序列化的时候序列对象的所有属性
-        objectMapper.setSerializationInclusion(JsonInclude.Include.ALWAYS);
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         //出现空bean得时候 序列化不报错
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS,false);
         //关闭时间转为时间戳
@@ -108,21 +108,12 @@ public class JsonUtil {
         }
     }
 
-<<<<<<< HEAD
-    public static <T> T string2Obj(String str,Class<?> collectionClass,Class<?>... elementClasses){
-        JavaType javaType = objectMapper.getTypeFactory().constructParametricType(collectionClass,elementClasses);
-        try {
-            return objectMapper.readValue(str,javaType);
-        } catch (Exception e) {
-            log.warn("Parse String to Object error",e);
-=======
     public static <T> T str2Obj(String objStr, Class<?> collectionsClass,Class<?>...elementsClass) {
         JavaType javaType = objectMapper.getTypeFactory().constructParametricType(collectionsClass,elementsClass);
         try {
             return objectMapper.readValue(objStr,javaType);
         } catch (Exception e) {
             log.warn("反序列化对象:{},collectionsClass:{},elementsClass:{},原因:{} ",objStr,collectionsClass,elementsClass,e);
->>>>>>> cd5de35ad5b89501bbe185d86d47434607c4c23c
             return null;
         }
     }

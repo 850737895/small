@@ -1,6 +1,6 @@
 package com.small.controller.portal;
 
-import com.small.common.CookieUtil;
+import com.small.utils.CookieUtil;
 import com.small.common.SystemCode;
 import com.small.common.SystemConst;
 import com.small.common.SystemResponse;
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 /**
  * 购物车控制器

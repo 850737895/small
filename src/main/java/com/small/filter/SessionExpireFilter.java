@@ -1,6 +1,6 @@
 package com.small.filter;
 
-import com.small.common.CookieUtil;
+import com.small.utils.CookieUtil;
 import com.small.common.SystemConst;
 import com.small.utils.RedisPoolUtil;
 import org.apache.commons.lang3.StringUtils;

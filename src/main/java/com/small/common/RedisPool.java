@@ -76,6 +76,7 @@ public class RedisPool {
     public static void main(String[] args) {
         Jedis jedis = getJedis();
         jedis.set("name","zhuwei");
+        System.out.println(jedis.get("name"));
         returnResource(jedis);
         jedisPool.destroy();
     }
