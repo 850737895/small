@@ -31,49 +31,23 @@ public class ShippingController {
 
     /**
      * 添加收货地址
-     * @param request request
      * @param shipping shipping
      * @return 返回shippingId
      */
     @RequestMapping("/add.do")
     @ResponseBody
-    public SystemResponse add(HttpServletRequest request, Shipping shipping) {
-        String tooken = CookieUtil.readCookie(request);
-        if(StringUtils.isBlank(tooken)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        String userStr = RedisPoolUtil.get(tooken);
-        if(StringUtils.isBlank(userStr)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        User user = JsonUtil.str2Obj(userStr,User.class);
-        if (null == user) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
+    public SystemResponse add( Shipping shipping) {
         return shippingServiceImpl.add(shipping);
     }
 
     /**
      * 删除地址
-     * @param request request
      * @param shippingId 收货地址Id
      * @return SystemResponse
      */
     @RequestMapping("/del.do")
     @ResponseBody
-    public SystemResponse<String> del(HttpServletRequest request, Integer shippingId) {
-        String tooken = CookieUtil.readCookie(request);
-        if(StringUtils.isBlank(tooken)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        String userStr = RedisPoolUtil.get(tooken);
-        if(StringUtils.isBlank(userStr)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        User user = JsonUtil.str2Obj(userStr,User.class);
-        if (null == user) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
+    public SystemResponse<String> del(User user, Integer shippingId) {
         if(shippingId == null) {
             return SystemResponse.createErrorByMsg("参数错误:shippingId 为null");
         }
@@ -82,20 +56,7 @@ public class ShippingController {
 
     @RequestMapping("/update.do")
     @ResponseBody
-    public SystemResponse<String> update(HttpServletRequest request,  Shipping shipping) {
-
-        String tooken = CookieUtil.readCookie(request);
-        if(StringUtils.isBlank(tooken)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        String userStr = RedisPoolUtil.get(tooken);
-        if(StringUtils.isBlank(userStr)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        User user = JsonUtil.str2Obj(userStr,User.class);
-        if (null == user) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
+    public SystemResponse<String> update(User user,  Shipping shipping) {
         if(shipping == null) {
             return SystemResponse.createErrorByMsg("参数错误:shipping 为null");
         }
@@ -104,19 +65,8 @@ public class ShippingController {
 
     @RequestMapping("/select.do")
     @ResponseBody
-    public SystemResponse<String> select(HttpServletRequest request,  Integer shippingId) {
-        String tooken = CookieUtil.readCookie(request);
-        if(StringUtils.isBlank(tooken)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        String userStr = RedisPoolUtil.get(tooken);
-        if(StringUtils.isBlank(userStr)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        User user = JsonUtil.str2Obj(userStr,User.class);
-        if (null == user) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
+    public SystemResponse<String> select(User user,  Integer shippingId) {
+
         if(shippingId == null) {
             return SystemResponse.createErrorByMsg("参数错误:shippingId 为null");
         }
@@ -125,21 +75,9 @@ public class ShippingController {
 
     @RequestMapping("/list.do")
     @ResponseBody
-    public SystemResponse<PageInfo> list(HttpServletRequest request, @RequestParam(value = "pageNum",defaultValue = "1") Integer pageNum,
+    public SystemResponse<PageInfo> list(User user, @RequestParam(value = "pageNum",defaultValue = "1") Integer pageNum,
                                          @RequestParam(value = "pageSize",defaultValue = "10") Integer pageSize) {
 
-        String tooken = CookieUtil.readCookie(request);
-        if(StringUtils.isBlank(tooken)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        String userStr = RedisPoolUtil.get(tooken);
-        if(StringUtils.isBlank(userStr)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        User user = JsonUtil.str2Obj(userStr,User.class);
-        if (null == user) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
         return shippingServiceImpl.list(user.getId(),pageNum,pageSize);
     }
 }

@@ -30,7 +30,9 @@ public class UserManagerController {
     @RequestMapping(value = "/login.do",method = RequestMethod.POST)
     @ResponseBody
     public SystemResponse<User> login(String username, String password, HttpSession session, HttpServletResponse response) {
+
         SystemResponse<User> userSystemResponse = userServiceImpl.doLogin(username,password);
+
         if(userSystemResponse.isSuccess()) {
             User user = userSystemResponse.getData();
             if(user.getRole() == SystemConst.Role.AMDIN) {

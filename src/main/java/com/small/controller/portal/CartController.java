@@ -30,101 +30,46 @@ public class CartController {
 
     /**
      * 购物车列表查询
-     * @param request request
      * @return SystemResponse<CartVo>
      */
     @RequestMapping("/list.do")
     @ResponseBody
-    public SystemResponse<CartVo> list(HttpServletRequest request) {
-        //登录判断
-        String tooken = CookieUtil.readCookie(request);
-        if(StringUtils.isBlank(tooken)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        String userStr = RedisPoolUtil.get(tooken);
-        if(StringUtils.isBlank(userStr)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        User user = JsonUtil.str2Obj(userStr,User.class);
-        if (null == user) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
+    public SystemResponse<CartVo> list(User user) {
         return cartServiceImpl.list(user.getId());
     }
 
 
     /**
      * 添加购物车
-     * @param request request
      * @return SystemResponse<CartVo>
      */
     @RequestMapping("/add.do")
     @ResponseBody
-    public SystemResponse<CartVo> add(HttpServletRequest request,Integer productId,Integer count) {
-        //登录判断
-        //登录判断
-        String tooken = CookieUtil.readCookie(request);
-        if(StringUtils.isBlank(tooken)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        String userStr = RedisPoolUtil.get(tooken);
-        if(StringUtils.isBlank(userStr)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        User user = JsonUtil.str2Obj(userStr,User.class);
-        if(null == user) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
+    public SystemResponse<CartVo> add(User user,Integer productId,Integer count) {
         return cartServiceImpl.add(user.getId(),productId,count);
     }
 
     /**
      * 更新产品数量
-     * @param request request
      * @param productId productId
      * @param count count
      * @return SystemResponse<CartVo>
      */
     @RequestMapping("/update.do")
     @ResponseBody
-    public SystemResponse<CartVo> update(HttpServletRequest request,Integer productId,Integer count) {
-        //登录判断
-        String tooken = CookieUtil.readCookie(request);
-        if(StringUtils.isBlank(tooken)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        String userStr = RedisPoolUtil.get(tooken);
-        if(StringUtils.isBlank(userStr)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        User user = JsonUtil.str2Obj(userStr,User.class);
-        if(null == user) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
+    public SystemResponse<CartVo> update(User user,Integer productId,Integer count) {
         return cartServiceImpl.update(user.getId(),productId,count);
     }
 
     /**
      * 删除购物车中的产品数量
-     * @param request request
      * @param productIds  产品id 集合 使用 ,分割
      * @return SystemResponse<CartVo>
      */
     @RequestMapping("/delete_product.do")
     @ResponseBody
-    public SystemResponse<CartVo> del(HttpServletRequest request,String productIds) {
-        String tooken = CookieUtil.readCookie(request);
-        if(StringUtils.isBlank(tooken)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        String userStr = RedisPoolUtil.get(tooken);
-        if(StringUtils.isBlank(userStr)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        User user = JsonUtil.str2Obj(userStr,User.class);
-        if(null == user) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
+    public SystemResponse<CartVo> del(User user,String productIds) {
+
         if(StringUtils.isBlank(productIds)) {
             return SystemResponse.createErrorByMsg(SystemConst.ARGS_ERROR);
         }
@@ -133,25 +78,14 @@ public class CartController {
 
     /**
      * 购物车勾选
-     * @param request  request
+     * User user
      * @param productId productId
      * @return SystemResponse<CartVo>
      */
     @RequestMapping("/select.do")
     @ResponseBody
-    public SystemResponse<CartVo> select(HttpServletRequest request,Integer productId) {
-        String tooken = CookieUtil.readCookie(request);
-        if(StringUtils.isBlank(tooken)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        String userStr = RedisPoolUtil.get(tooken);
-        if(StringUtils.isBlank(userStr)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        User user = JsonUtil.str2Obj(userStr,User.class);
-        if(null == user) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
+    public SystemResponse<CartVo> select(User user,Integer productId) {
+
         if(productId == null) {
             return SystemResponse.createErrorByMsg(SystemConst.ARGS_ERROR);
         }
@@ -160,25 +94,13 @@ public class CartController {
 
     /**
      * 购物车中不够选
-     * @param request   request
+     *  User user
      * @param productId productId
      * @return SystemResponse<CartVo>
      */
     @RequestMapping("/un_select.do")
     @ResponseBody
-    public SystemResponse<CartVo> unSelect(HttpServletRequest request,Integer productId) {
-        String tooken = CookieUtil.readCookie(request);
-        if(StringUtils.isBlank(tooken)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        String userStr = RedisPoolUtil.get(tooken);
-        if(StringUtils.isBlank(userStr)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        User user = JsonUtil.str2Obj(userStr,User.class);
-        if(null == user) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
+    public SystemResponse<CartVo> unSelect(User user,Integer productId) {
         if(productId == null) {
             return SystemResponse.createErrorByMsg(SystemConst.ARGS_ERROR);
         }
@@ -187,72 +109,31 @@ public class CartController {
 
     /**
      * 购物车全选
-     * @param request request
      * @return SystemResponse<CartVo>
      */
     @RequestMapping("/select_all.do")
     @ResponseBody
-    public SystemResponse<CartVo> selectAll(HttpServletRequest request) {
-        String tooken = CookieUtil.readCookie(request);
-        if(StringUtils.isBlank(tooken)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        String userStr = RedisPoolUtil.get(tooken);
-        if(StringUtils.isBlank(userStr)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        User user = JsonUtil.str2Obj(userStr,User.class);
-        if(null == user) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-
+    public SystemResponse<CartVo> selectAll(User user) {
         return cartServiceImpl.selectOrUnSelect(user.getId(),null,SystemConst.CART_IS_CHECKED);
     }
 
     /**
      * 购物车全不选
-     * @param request request
      * @return SystemResponse<CartVo>
      */
     @RequestMapping("/un_select_all.do")
     @ResponseBody
-    public SystemResponse<CartVo> select(HttpServletRequest request) {
-        String tooken = CookieUtil.readCookie(request);
-        if(StringUtils.isBlank(tooken)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        String userStr = RedisPoolUtil.get(tooken);
-        if(StringUtils.isBlank(userStr)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        User user = JsonUtil.str2Obj(userStr,User.class);
-        if(null == user) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-
+    public SystemResponse<CartVo> select(User user) {
         return cartServiceImpl.selectOrUnSelect(user.getId(),null,SystemConst.CART_IS_UNCHECKED);
     }
 
     /**
      * 获取购物车中产品的数量
-     * @param request request
      * @return SystemResponse<CartVo>
      */
     @RequestMapping("/get_cart_product_count.do")
     @ResponseBody
-    public SystemResponse<Integer> getCartProductCount(HttpServletRequest request) {
-        String tooken = CookieUtil.readCookie(request);
-        if(StringUtils.isBlank(tooken)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        String userStr = RedisPoolUtil.get(tooken);
-        if(StringUtils.isBlank(userStr)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        User user = JsonUtil.str2Obj(userStr,User.class);
-        if(null == user) {
-            return SystemResponse.createSuccessByMsg("0");
-        }
+    public SystemResponse<Integer> getCartProductCount(User user) {
         return cartServiceImpl.getCartProductCount(user.getId());
     }
 

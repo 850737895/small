@@ -28,6 +28,10 @@
                 </property>
             </bean>
         </mvc:message-converters>
+        <!--注入自定义参数解析器-->
+        <mvc:argument-resolvers>
+            <bean class="com.small.Resolver.UserArgsResolver"></bean>
+        </mvc:argument-resolvers>
     </mvc:annotation-driven>
 
 
@@ -44,6 +48,11 @@
         <mvc:interceptor>
             <mvc:mapping path="/manager/**"/>
             <bean class="com.small.interceptors.AuthManagerInterceptor"></bean>
+        </mvc:interceptor>
+
+        <mvc:interceptor>
+            <mvc:mapping path="/user/**"/>
+            <bean class="com.small.interceptors.AuthInterceptor"></bean>
         </mvc:interceptor>
     </mvc:interceptors>
 </beans>

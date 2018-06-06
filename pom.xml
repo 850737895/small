@@ -316,10 +316,18 @@
         <excludes>
           <exclude>*.jsp</exclude>
         </excludes>
+        <includes>
+          <include>**/*.properties</include>
+          <include>**/*.xml</include>
+        </includes>
       </resource>
       <!--maven打包公用的-->
       <resource>
         <directory>src/main/resources</directory>
+        <includes>
+          <include>**/*.properties</include>
+          <include>**/*.xml</include>
+        </includes>
       </resource>
     </resources>
   </build>

@@ -8,6 +8,7 @@ import com.small.pojo.User;
 import com.small.service.IUserService;
 import com.small.utils.JsonUtil;
 import com.small.utils.RedisPoolUtil;
+import com.small.utils.RedisShardingPoolUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -93,26 +94,12 @@ public class UserController {
 
     /**
      * 获取用户的信息
-     * @param request request
      * @return SystemResponse
      */
     @RequestMapping(value = "/get_user_info.do",method = RequestMethod.POST)
     @ResponseBody
-    public SystemResponse<User> getUserInfo(HttpServletRequest request) {
+    public SystemResponse<User> getUserInfo(User user) {
 
-        String cookieValue = CookieUtil.readCookie(request);
-
-        if(StringUtils.isBlank(cookieValue)) {
-            return SystemResponse.createErrorByMsg(SystemConst.USER_NOT_LOGIN);
-        }
-        String userStr = RedisPoolUtil.get(cookieValue);
-        if(StringUtils.isBlank(userStr)) {
-            return SystemResponse.createErrorByMsg("用户session以失效,请重新登录");
-        }
-        User user = JsonUtil.str2Obj(userStr,User.class);
-        if(null == user) {
-            return SystemResponse.createErrorByMsg(SystemConst.USER_NOT_LOGIN);
-        }
         return SystemResponse.createSuccessByData(user);
     }
 
@@ -153,53 +140,31 @@ public class UserController {
      * 在线更新密码
      * @param oldPassword 老密码
      * @param newPassword  新密码
-     * @param request request
      * @return  SystemResponse
      */
     @RequestMapping(value = "/reset_password.do",method = RequestMethod.POST)
     @ResponseBody
-    public SystemResponse<String> resetPassword(String oldPassword,String newPassword,HttpServletRequest request) {
-        String token = CookieUtil.readCookie(request);
-        if(StringUtils.isBlank(token)) {
-            return SystemResponse.createErrorByMsg(SystemConst.USER_NOT_LOGIN);
-        }
-        String userStr = RedisPoolUtil.get(token);
-        if(StringUtils.isBlank(userStr)) {
-            return SystemResponse.createErrorByMsg("用户session以失效,请重新登录");
-        }
-        User user = JsonUtil.str2Obj(userStr,User.class);
-        if ( null == user) {
-            return SystemResponse.createErrorByMsg(SystemConst.USER_NOT_LOGIN);
-        }
+    public SystemResponse<String> resetPassword(String oldPassword,String newPassword,User user) {
         return userServiceImpl.resetPassword(oldPassword,newPassword,user);
     }
 
     /**
      * 更新用户信息
      * @param user user对象
-     * @param request request
      * @return SystemResponse
      */
     @RequestMapping(value = "/update_information.do",method = RequestMethod.POST)
     @ResponseBody
-    public SystemResponse<String> updateUserInfo(User user,HttpServletRequest request) {
-        String token = CookieUtil.readCookie(request);
-        if(StringUtils.isBlank(token)) {
-            return SystemResponse.createErrorByMsg(SystemConst.USER_NOT_LOGIN);
-        }
-        String userStr = RedisPoolUtil.get(token);
-        if(StringUtils.isBlank(userStr)) {
-            return SystemResponse.createErrorByMsg("用户session以失效,请重新登录");
-        }
-        User sessionUser= JsonUtil.str2Obj(userStr,User.class);
-        if ( null == user) {
-            return SystemResponse.createErrorByMsg(SystemConst.USER_NOT_LOGIN);
-        }
-        user.setId(sessionUser.getId());
-        user.setUsername(sessionUser.getUsername());
+    public SystemResponse<String> updateUserInfo(@RequestParam("email")String email,
+                                                 @RequestParam("question")String question,
+                                                 @RequestParam("answer")String answer,
+                                                 @RequestParam("phone") String phone,User user) {
+        user.setEmail(email);
+        user.setPhone(phone);
+        user.setAnswer(answer);
+        user.setQuestion(question);
         SystemResponse<User> userSystemResponse = userServiceImpl.updateUserInfo(user);
         if(userSystemResponse.isSuccess()) {
-            RedisPoolUtil.setex(token,SystemConst.SessionCacheTime.SESSION_IN_REDIS_EXPIRE,JsonUtil.obj2Str(user));
             return SystemResponse.createSuccessByMsg(SystemConst.UPDATE_USERINFO_SUCCESS);
         }else {
             return SystemResponse.createErrorByMsg(SystemConst.UPDATE_USERINFO_ERROR);
@@ -208,24 +173,12 @@ public class UserController {
 
     /**
      * 需要强制登录
-     * @param request request
      * @return
      */
     @RequestMapping(value = "/get_information.do",method = RequestMethod.POST)
     @ResponseBody
-    public SystemResponse<User> getInformation(HttpServletRequest request) {
-        String tooken = CookieUtil.readCookie(request);
-        if(StringUtils.isBlank(tooken)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        String userStr = RedisPoolUtil.get(tooken);
-        if(StringUtils.isBlank(userStr)) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
-        User user = JsonUtil.str2Obj(userStr,User.class);
-        if (null == user) {
-            return SystemResponse.createErrorByCodeMsg(SystemCode.NEED_LOGIN.getCode(),SystemCode.NEED_LOGIN.getMsg());
-        }
+    public SystemResponse<User> getInformation(User user) {
+
         return userServiceImpl.getInformation(user.getId());
     }
 

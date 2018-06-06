@@ -74,6 +74,8 @@ public class CookieUtil {
                     cookie.setPath("/");
                     //cookie.setDomain(COOKIE_DOMAIN);
                     response.addCookie(cookie);
+                    //删除redis中的信息
+                    RedisShardingPoolUtil.del(cookie.getValue());
                     return;
                 }
             }

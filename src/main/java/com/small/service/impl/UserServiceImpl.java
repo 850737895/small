@@ -176,7 +176,7 @@ public class UserServiceImpl implements IUserService  {
         }
         User updateUser = new User();
         updateUser.setId(user.getId());
-        updateUser.setPassword(MD5Util.MD5EncodeUtf8(user.getPassword()));
+        updateUser.setEmail(user.getEmail());
         updateUser.setQuestion(user.getQuestion());
         updateUser.setAnswer(user.getAnswer());
         updateUser.setPhone(user.getPhone());
