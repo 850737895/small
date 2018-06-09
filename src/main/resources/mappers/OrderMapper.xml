@@ -228,4 +228,24 @@
     order BY
     create_time desc
   </select>
+
+  <select id="selectByStatusAndCreateTime" parameterType="map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from
+    mmall_order
+    where
+    status=#{orderStatus}
+    <![CDATA[
+    and create_time<=#{closeOrderTimeStr}
+    ]]>
+    order by create_time asc
+  </select>
+
+  <update id="closeTimeoutOrderByOrderNo" parameterType="long">
+    update mmall_order
+    set status=0,
+    close_time = now()
+    where order_no = #{orderNo}
+  </update>
 </mapper>

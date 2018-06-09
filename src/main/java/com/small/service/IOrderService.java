@@ -2,6 +2,7 @@ package com.small.service;
 
 import com.github.pagehelper.PageInfo;
 import com.small.common.SystemResponse;
+import com.small.pojo.Order;
 import com.small.vo.OrderProductVo;
 import com.small.vo.OrderVo;
 
@@ -114,4 +115,9 @@ public interface IOrderService {
      * @return SystemResponse<String>
      */
     SystemResponse<String> manageSendGoods(Long orderNo);
+
+    /** 定时关闭订单
+     * @param noPayAfterCreateOrder 关单时间
+     */
+    void closeTimeoutOrder(Integer noPayAfterCreateOrder );
 }

@@ -121,4 +121,8 @@ public class SystemConst {
 
     }
 
+    public interface REDIS_KEY{
+        String REDIS_LOCK_KEY = "CLOSE_TIMEOUT_ORDER_KEY";
+    }
+
 }

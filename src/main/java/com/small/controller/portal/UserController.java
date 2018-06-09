@@ -1,21 +1,15 @@
 package com.small.controller.portal;
 
 import com.small.utils.CookieUtil;
-import com.small.common.SystemCode;
 import com.small.common.SystemConst;
 import com.small.common.SystemResponse;
 import com.small.pojo.User;
 import com.small.service.IUserService;
 import com.small.utils.JsonUtil;
 import com.small.utils.RedisPoolUtil;
-import com.small.utils.RedisShardingPoolUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,7 +38,7 @@ public class UserController {
     public SystemResponse<User> login(@RequestParam("username")String userName,
                                       @RequestParam("password")String password,
                                       HttpSession httpSession,
-                                      HttpServletResponse response)
+                                      HttpServletResponse response) throws Exception
     {
         String token = httpSession.getId();
         SystemResponse<User> userSystemResponse = userServiceImpl.doLogin(userName,password);
@@ -92,6 +86,14 @@ public class UserController {
         return userServiceImpl.checkValid(str,type);
     }
 
+
+    @RequestMapping(value = "/check_valid/{str}/{type}",method = RequestMethod.POST)
+    @ResponseBody
+    public SystemResponse<String> checkValidRESTful(@PathVariable("str") String str,@PathVariable("type") String type) {
+        return userServiceImpl.checkValid(str,type);
+    }
+
+
     /**
      * 获取用户的信息
      * @return SystemResponse
@@ -110,6 +112,12 @@ public class UserController {
     @RequestMapping(value = "/forget_get_question.do",method = RequestMethod.POST)
     @ResponseBody
     public SystemResponse<String> forgetGetQuestion(String username) {
+        return userServiceImpl.selectQuestion(username);
+    }
+
+    @RequestMapping(value = "/forget_get_question/{username}",method = RequestMethod.POST)
+    @ResponseBody
+    public SystemResponse<String> forgetGetQuestionRESTful(@PathVariable("username") String username) {
         return userServiceImpl.selectQuestion(username);
     }
 

@@ -7,6 +7,7 @@ import com.small.common.SystemConst;
 import com.small.common.SystemResponse;
 import com.small.dao.CartMapper;
 import com.small.dao.ProductMapper;
+import com.small.exceptions.SmallException;
 import com.small.pojo.Cart;
 import com.small.pojo.Product;
 import com.small.service.ICartService;
@@ -35,14 +36,14 @@ public class CartServiceImpl implements ICartService {
     private ProductMapper productMapper;
 
     @Override
-    public SystemResponse<CartVo> list(Integer userId) {
+    public SystemResponse<CartVo> list(Integer userId)throws RuntimeException {
         return SystemResponse.createSuccessByData(assembleCartVo(userId));
     }
 
     @Override
-    public SystemResponse<CartVo> add(Integer userId, Integer productId, Integer count) {
+    public SystemResponse<CartVo> add(Integer userId, Integer productId, Integer count) throws RuntimeException {
         if(productId == null || count == null){
-            return SystemResponse.createErrorByCodeMsg(SystemCode.ILLEGAL_ARGUMENT.getCode(),SystemCode.ILLEGAL_ARGUMENT.getMsg());
+            throw new SmallException(SystemCode.ILLEGAL_ARGUMENT);
         }
         //判断用户是否买过该产品
         Cart cart = cartMapper.selectByUserIdAndProductId(userId,productId);
@@ -95,7 +96,7 @@ public class CartServiceImpl implements ICartService {
      * @param userId 用户ID
      * @return CartVo
      */
-    private CartVo assembleCartVo(Integer userId) {
+    private CartVo assembleCartVo(Integer userId) throws RuntimeException {
         CartVo cartVo = new CartVo();
         List<Cart> cartList = cartMapper.selectCartsByUserId(userId);
         List<CartProductVo> cartProductVoList = Lists.newArrayList();

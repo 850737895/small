@@ -29,6 +29,7 @@ import com.small.vo.OrderVo;
 import com.small.vo.ShippingVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.io.File;
@@ -622,6 +624,30 @@ public class OrderServiceImpl implements IOrderService {
             return SystemResponse.createSuccessByMsg("发货成功");
         }
         return SystemResponse.createErrorByMsg("发货失败");
+    }
+
+    @Override
+    public void closeTimeoutOrder(Integer noPayAfterCreateOrder) {
+
+        Date closeOrderTime = DateUtils.addHours(new Date(),Integer.valueOf(noPayAfterCreateOrder));
+        String closeOrderTimeStr = DateUtil.date2DateStr(closeOrderTime);
+
+        List<Order> orderList = orderMapper.selectByStatusAndCreateTime(OrderStatusEnum.NO_PAY.getCode(),closeOrderTimeStr);
+        for (Order order: orderList) {
+            List<OrderItem> orderItemList = orderItemMapper.selectByOrderNo(order.getOrderNo());
+            for (OrderItem orderItem: orderItemList) {
+                Integer stock = productMapper.selectStockByIdWithRowLock(orderItem.getProductId());
+                //商品下架
+                if(stock == null) {
+                    continue;
+                }
+                Product product = new Product();
+                product.setId(orderItem.getProductId());
+                product.setStock(orderItem.getQuantity()+stock);
+                productMapper.updateByPrimaryKeySelective(product);
+            }
+            orderMapper.closeTimeoutOrderByOrderNo(order.getOrderNo());
+        }
     }
 
     /**

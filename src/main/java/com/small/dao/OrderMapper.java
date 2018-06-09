@@ -26,4 +26,8 @@ public interface OrderMapper {
     List<Order> selectByUserId(Integer userId);
 
     List<Order> selectAll();
+
+    List<Order> selectByStatusAndCreateTime(@Param("orderStatus") Integer orderStatus,@Param("closeOrderTimeStr") String closeOrderTimeStr);
+
+    void closeTimeoutOrderByOrderNo(Long orderNo);
 }

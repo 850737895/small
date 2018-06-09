@@ -8,7 +8,16 @@
 	http://www.springframework.org/schema/mvc
 	http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-    <context:component-scan base-package="com.small.controller" annotation-config="true"/>
+    <!--包扫描配置
+       1:annotation-config="true" 配置该选项 表示可以操作容器中的bean  比如把service 注入到service 的@AutoWired
+       2:use-default-filters="false"  关闭系统自动扫描的包路径 通过include-filter来指定扫描 如果不设置为false
+       那么就扫描com.small
+    -->
+    <context:component-scan base-package="com.small" annotation-config="true" use-default-filters="false">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+    </context:component-scan>
+
+
 
     <mvc:annotation-driven>
         <mvc:message-converters>
@@ -30,7 +39,7 @@
         </mvc:message-converters>
         <!--注入自定义参数解析器-->
         <mvc:argument-resolvers>
-            <bean class="com.small.Resolver.UserArgsResolver"></bean>
+            <bean class="com.small.resolver.UserArgsResolver"></bean>
         </mvc:argument-resolvers>
     </mvc:annotation-driven>
 

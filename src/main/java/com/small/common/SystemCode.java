@@ -13,6 +13,8 @@ public enum SystemCode {
     ILLEGAL_ARGUMENT(2,"ILLEGAL_ARGUMENT"),
 
     NEED_LOGIN(10,"NEED_LOGIN"),
+
+    SERVER_ERROR(-1,"服务端异常")
     ;
 
     private Integer code;

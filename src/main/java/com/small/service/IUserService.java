@@ -15,7 +15,7 @@ public interface IUserService {
      * @param password 密码
      * @return SystemResponse<User>
      */
-     SystemResponse<User> doLogin(String userName,String password);
+     SystemResponse<User> doLogin(String userName,String password) throws RuntimeException;
 
     /**
      * 用户注册接口

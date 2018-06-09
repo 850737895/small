@@ -12,7 +12,9 @@ import com.small.vo.CartVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -76,6 +78,17 @@ public class CartController {
         return cartServiceImpl.del(user.getId(),productIds);
     }
 
+    //TODO restful接口 http://localhost:8080/small/cart/1  delete的方式
+    @RequestMapping(value = "/{productIds}",method = RequestMethod.DELETE)
+    @ResponseBody
+    public SystemResponse<CartVo> delRESTful(User user,@PathVariable("productIds") String productIds) {
+
+        if(StringUtils.isBlank(productIds)) {
+            return SystemResponse.createErrorByMsg(SystemConst.ARGS_ERROR);
+        }
+        return cartServiceImpl.del(user.getId(),productIds);
+    }
+
     /**
      * 购物车勾选
      * User user
@@ -85,7 +98,6 @@ public class CartController {
     @RequestMapping("/select.do")
     @ResponseBody
     public SystemResponse<CartVo> select(User user,Integer productId) {
-
         if(productId == null) {
             return SystemResponse.createErrorByMsg(SystemConst.ARGS_ERROR);
         }

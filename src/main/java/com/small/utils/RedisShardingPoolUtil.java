@@ -58,6 +58,22 @@ public class RedisShardingPoolUtil {
         return result;
     }
 
+    public static Long  setnx(String key,String value) {
+        ShardedJedis jedis = null;
+        Long result = null;
+        try {
+            jedis = RedisShardingPool.getJedis();
+            result = jedis.setnx(key,value);
+        } catch (Exception e) {
+            log.error("setex key:{},value:{},error:{}",key,value,e);
+            RedisShardingPool.returnBrokenResouce(jedis);
+            return result;
+        } finally {
+            RedisShardingPool.returnResource(jedis);
+        }
+        return result;
+    }
+
     /**
      * get 操作
      * @param key 键
@@ -69,6 +85,22 @@ public class RedisShardingPoolUtil {
         try {
             jedis = RedisShardingPool.getJedis();
             result = jedis.get(key);
+        } catch (Exception e) {
+            log.error("get key:{}error:{}",key,e);
+            RedisShardingPool.returnBrokenResouce(jedis);
+            return result;
+        } finally {
+            RedisShardingPool.returnResource(jedis);
+        }
+        return result;
+    }
+
+    public static String getset(String key,String value) {
+        ShardedJedis jedis = null;
+        String result = null;
+        try {
+            jedis = RedisShardingPool.getJedis();
+            result = jedis.getSet(key,value);
         } catch (Exception e) {
             log.error("get key:{}error:{}",key,e);
             RedisShardingPool.returnBrokenResouce(jedis);

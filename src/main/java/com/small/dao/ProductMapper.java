@@ -23,4 +23,6 @@ public interface ProductMapper {
     List<Product> selectByIdAndName(@Param("productId")Integer productId,@Param("productName")String productName);
 
     List<Product> selectByNameAndCategorys(@Param("keyWord")String keyWord,@Param("categoryList") List<Integer> categoryList);
+
+    Integer selectStockByIdWithRowLock(Integer productId);
 }

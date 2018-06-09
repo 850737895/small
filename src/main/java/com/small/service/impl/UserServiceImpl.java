@@ -5,6 +5,7 @@ import com.small.common.SystemConst;
 import com.small.common.SystemResponse;
 import com.small.common.TonkenCache;
 import com.small.dao.UserMapper;
+import com.small.exceptions.SmallException;
 import com.small.pojo.User;
 import com.small.service.IUserService;
 import com.small.utils.MD5Util;
@@ -25,16 +26,15 @@ public class UserServiceImpl implements IUserService  {
     private UserMapper userMapper;
 
     @Override
-    public SystemResponse<User> doLogin(String userName, String password) {
+    public SystemResponse<User> doLogin(String userName, String password) throws RuntimeException {
         int resultCount = userMapper.checkUserNameIsExist(userName);
-
         if(resultCount == 0) {
-            return SystemResponse.createErrorByMsg(SystemConst.USERNAME_NOT_EXIST);
+            throw new SmallException(SystemCode.ERROR.getCode(),SystemConst.USERNAME_NOT_EXIST);
         }
         String md5Password = MD5Util.MD5EncodeUtf8(password);
         User user = userMapper.selectLoginUser(userName,md5Password);
         if(null == user) {
-            return SystemResponse.createErrorByMsg(SystemConst.PASSWORD_ERROR);
+            throw new SmallException(SystemCode.ERROR.getCode(),SystemConst.PASSWORD_ERROR);
         }
         //置空返回给前端的密码
         user.setPassword(StringUtils.EMPTY);
