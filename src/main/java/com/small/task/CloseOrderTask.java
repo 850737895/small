@@ -127,7 +127,7 @@ public class CloseOrderTask {
     private void closeOrder(int redislockExpireTime) {
         //防止死锁，设置key的有效时间
         RedisShardingPoolUtil.expire(SystemConst.REDIS_KEY.REDIS_LOCK_KEY,redislockExpireTime);
-        //orderServiceImpl.closeTimeoutOrder(Integer.valueOf(PropertiesUtil.getPropertyValues("close.order.time","1")));
+        orderServiceImpl.closeTimeoutOrder(Integer.valueOf(PropertiesUtil.getPropertyValues("close.order.time","1")));
         //若定时任务很轻的时候，减少redis锁资源占用
         RedisShardingPoolUtil.del(SystemConst.REDIS_KEY.REDIS_LOCK_KEY);
     }
