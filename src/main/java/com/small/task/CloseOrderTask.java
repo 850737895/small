@@ -1,14 +1,12 @@
 package com.small.task;
 
 import com.small.common.RedissonManager;
-import com.small.common.SystemCode;
 import com.small.common.SystemConst;
 import com.small.service.IOrderService;
 import com.small.utils.PropertiesUtil;
 import com.small.utils.RedisShardingPoolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.redisson.Redisson;
 import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -65,9 +63,9 @@ public class CloseOrderTask {
     /**
      * 集群环境下的双层防死锁。
      */
-    //@Scheduled(cron = "0 0/1 * * *  ?")
+    @Scheduled(cron = "0 0/1 * * *  ?")
     public void closeTimeoutOrderV3() {
-        log.info("定时关单定时任务启动..........单重防死锁");
+        log.info("定时关单定时任务启动..........双重防死锁");
 
         //redis分布式锁的失效时间(秒为单位)
         int redislockExpireTime =Integer.valueOf(PropertiesUtil.getPropertyValues("redis.lock.key.time","5"));
@@ -101,35 +99,27 @@ public class CloseOrderTask {
         log.info("定时关单定时任务结束..........双重防死锁");
     }
 
-    /**
-     * 使用redisson构建分布式锁
-     */
-    @Scheduled(cron = "0 0/1 * * * ?")
-    public void closeTimeoutOrderV4() {
-        log.info("定时关单定时任务启动..........单重防死锁");
-        Redisson redisson = redissonManager.getRedisson();
-        boolean isGetLock = false;
-        RLock lock =redisson.getLock(SystemConst.REDIS_KEY.REDIS_LOCK_KEY);
-        int waitTime = Integer.valueOf(PropertiesUtil.getPropertyValues("redisson.lock.wait.time","0"));
-        int releaseTime = Integer.valueOf(PropertiesUtil.getPropertyValues("redisson.lock.release.time","50"));
-
+    //@Scheduled(cron = "0 0/1 * * *  ?")
+    public void closeOrderTaskV4(){
+        RLock lock = redissonManager.getRedisson().getLock(SystemConst.REDIS_KEY.REDIS_LOCK_KEY);
+        boolean getLock = false;
         try {
-            //获取到分布式锁
-            if(isGetLock = lock.tryLock(waitTime,releaseTime, TimeUnit.SECONDS)) {
-                log.info("获取到分布式锁:{}",SystemConst.REDIS_KEY.REDIS_LOCK_KEY);
-                //orderServiceImpl.closeTimeoutOrder(Integer.valueOf(PropertiesUtil.getPropertyValues("close.order.time","1")));
-            }else {
-                log.info("没有获取到分布式锁........");
+            if(getLock = lock.tryLock(0,50, TimeUnit.SECONDS)){
+                log.info("Redisson获取到分布式锁:{},ThreadName:{}",SystemConst.REDIS_KEY.REDIS_LOCK_KEY,Thread.currentThread().getName());
+                int hour = Integer.parseInt(PropertiesUtil.getPropertyValues("close.order.time","1"));
+//              orderServiceImpl.closeTimeoutOrder(Integer.valueOf(PropertiesUtil.getPropertyValues("close.order.time","1")));
+            }else{
+                log.info("Redisson没有获取到分布式锁:{},ThreadName:{}",SystemConst.REDIS_KEY.REDIS_LOCK_KEY,Thread.currentThread().getName());
             }
         } catch (InterruptedException e) {
-            log.info("分布式锁构建失败{}",e);
-        }finally {
-            if(!isGetLock) {
-                return ;
+            log.error("Redisson分布式锁获取异常",e);
+        } finally {
+            if(!getLock){
+                return;
             }
             lock.unlock();
+            log.info("Redisson分布式锁释放锁");
         }
-
     }
 
 
