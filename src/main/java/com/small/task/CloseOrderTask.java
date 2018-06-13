@@ -131,4 +131,6 @@ public class CloseOrderTask {
         //若定时任务很轻的时候，减少redis锁资源占用
         RedisShardingPoolUtil.del(SystemConst.REDIS_KEY.REDIS_LOCK_KEY);
     }
+
+
 }
