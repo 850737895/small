@@ -7,6 +7,8 @@ import com.small.common.SystemResponse;
 import com.small.dao.CategoryMapper;
 import com.small.pojo.Category;
 import com.small.service.ICategoryService;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

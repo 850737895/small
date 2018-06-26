@@ -9,4 +9,8 @@ public interface IRedisLockService {
      * 第一个版本单重防死锁功能
      */
     public void lockV1ForCloseOrder();
+
+    public void lockV2ForCloseOrder();
+
+    public void lockV3ForCloseOrder();
 }

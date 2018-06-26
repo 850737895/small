@@ -1,9 +1,13 @@
 package com.small.task;
 
+import com.small.common.RedisPool;
 import com.small.common.RedissonManager;
 import com.small.common.SystemConst;
+import com.small.pojo.SMS;
 import com.small.service.IOrderService;
+import com.small.utils.JsonUtil;
 import com.small.utils.PropertiesUtil;
+import com.small.utils.RedisPoolUtil;
 import com.small.utils.RedisShardingPoolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +42,24 @@ public class CloseOrderTask {
         log.info("定时关单任务完成");
     }
 
+    @Scheduled(cron = "0/30 * * * * ?")
+    public void consumerMessage() throws InterruptedException {
+        while (true) {
+            String smsStr = RedisPoolUtil.rpop("sms_queue");
+            if(StringUtils.isNotEmpty(smsStr)) {
+                SMS sms = JsonUtil.str2Obj(smsStr,SMS.class);
+                //模拟发送短信
+                Thread.sleep(500);
+                log.info("消费成功一条消息================>:{}",smsStr);
+                //发送失败
+                if(sms.hashCode()%12==5){
+                    RedisPoolUtil.lpush("sms_queue",smsStr);
+                    log.info("消费失败一条消息,消息再次写入到队列中================>:{}",smsStr);
+                }
+            }
+        }
+    }
+
     /**
      * 集群环境下的单重防死锁。
      */
@@ -63,7 +85,7 @@ public class CloseOrderTask {
     /**
      * 集群环境下的双层防死锁。
      */
-    @Scheduled(cron = "0 0/1 * * *  ?")
+    //@Scheduled(cron = "0 0/1 * * *  ?")
     public void closeTimeoutOrderV3() {
         log.info("定时关单定时任务启动..........双重防死锁");
 
@@ -122,6 +144,10 @@ public class CloseOrderTask {
         }
     }
 
+    public void closeOrderTaskV5() {
+
+    }
+
 
 
     private void closeOrder(int redislockExpireTime) {
@@ -131,6 +157,8 @@ public class CloseOrderTask {
         //若定时任务很轻的时候，减少redis锁资源占用
         RedisShardingPoolUtil.del(SystemConst.REDIS_KEY.REDIS_LOCK_KEY);
     }
+
+
 
 
 }

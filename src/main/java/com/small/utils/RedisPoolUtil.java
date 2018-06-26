@@ -2,7 +2,10 @@ package com.small.utils;
 
 import com.small.common.RedisPool;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import redis.clients.jedis.Jedis;
+
+import java.util.Collections;
 
 /**
  * redis连接池工具
@@ -25,6 +28,89 @@ public class RedisPoolUtil {
             result = jedis.set(key,value);
         } catch (Exception e) {
             log.error("set key:{},value:{},error:{}",key,value,e);
+            RedisPool.returnBrokenResouce(jedis);
+            return result;
+        } finally {
+            RedisPool.returnResource(jedis);
+        }
+        return result;
+    }
+
+    /**
+     * list接口存储用作消息队列
+     * @param queueName  队列名称
+     * @param value 消息
+     * @return 成功
+     */
+    public static long lpush(String queueName,String value) {
+        Jedis jedis = null;
+        Long result = null;
+        try {
+            jedis = RedisPool.getJedis();
+            result = jedis.lpush(queueName,value);
+        } catch (Exception e) {
+            log.error("lpush key:{},value:{},异常:{}",queueName,value,e);
+            RedisPool.returnBrokenResouce(jedis);
+            return result;
+        } finally {
+            RedisPool.returnResource(jedis);
+        }
+        return result;
+    }
+
+    /**
+     * 判断是否为空
+     * @param queueName 队列名称
+     * @return  true|false
+     */
+    public static boolean isEmptyQueue(String queueName) {
+
+        Jedis jedis = null;
+        Long result = null;
+        try {
+            jedis = RedisPool.getJedis();
+            if(jedis.llen(queueName).intValue() == 0) {
+                return false;
+            }
+            return true;
+        } catch (Exception e) {
+            log.error("isEmptyQueue key:{},异常:{}",queueName,e);
+            RedisPool.returnBrokenResouce(jedis);
+            return false;
+        } finally {
+            RedisPool.returnResource(jedis);
+        }
+    }
+
+    /**
+     * 出队操作
+     * @param queueName 队列名称
+     * @return 队首消息
+     */
+    public static String rpop(String queueName) {
+        Jedis jedis = null;
+        String result = null;
+        try {
+            jedis = RedisPool.getJedis();
+            result = jedis.rpop(queueName);
+        } catch (Exception e) {
+            log.error("rpop key:{},异常:{}",queueName,e);
+            RedisPool.returnBrokenResouce(jedis);
+            return result;
+        } finally {
+            RedisPool.returnResource(jedis);
+        }
+        return result;
+    }
+
+    public static String set(String key,String value,String set_if_not_exits,String set_with_expire_time,int expire) {
+        Jedis jedis = null;
+        String result = null;
+        try {
+            jedis = RedisPool.getJedis();
+            result = jedis.set(key,value,set_if_not_exits,set_with_expire_time,expire);
+        } catch (Exception e) {
+            log.error("set key:{},value:{},set_if_not_exits:{},set_with_expire_time:{},expire:{},error:{}",key,value,set_if_not_exits,set_with_expire_time,expire,e);
             RedisPool.returnBrokenResouce(jedis);
             return result;
         } finally {
@@ -223,6 +309,24 @@ public class RedisPoolUtil {
         return result;
     }
 
+
+    public static long eval(String script,String lock,String lockValue) {
+        Jedis jedis = null;
+        //删除锁失败
+        long result = 0;
+        try {
+            jedis = RedisPool.getJedis();
+            result = (Long) jedis.eval(script, Collections.singletonList(lock),Collections.singletonList(lockValue));
+            return result;
+        } catch (Exception e) {
+            log.error("eval script:{},lock:{},lockValue:{},error:{}",script,lock,lockValue,e);
+            RedisPool.returnBrokenResouce(jedis);
+        } finally {
+            RedisPool.returnResource(jedis);
+        }
+        return result;
+
+    }
 
 
     public static void main(String[] args) {
